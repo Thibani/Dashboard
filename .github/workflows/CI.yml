@@ -11,7 +11,7 @@ jobs:
 
   mirror-to-epitech:
       runs-on: ubuntu-latest
-      needs: build-and-check
+      # needs: build-and-check
       if: |
         github.ref == 'refs/heads/main' &&
         github.event_name == 'push' &&
