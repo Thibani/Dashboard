@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dashboard_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dashboard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dashboard}
+      POSTGRES_DB: ${POSTGRES_DB:-dashboard}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dashboard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # NOTE: this service must be named/served so that the subject's
+  # mandatory check (GET http://localhost:8080/about.json) passes.
+  server:
+    build:
+      context: ./backend
+      target: ${BUILD_TARGET:-production}
+    container_name: dashboard_server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 8080
+      DATABASE_URL: postgres://${POSTGRES_USER:-dashboard}:${POSTGRES_PASSWORD:-dashboard}@postgres:5432/${POSTGRES_DB:-dashboard}
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_env}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./frontend
+      target: ${BUILD_TARGET:-production}
+    container_name: dashboard_client
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
