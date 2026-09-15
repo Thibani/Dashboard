@@ -71,4 +71,4 @@ chmod +x .git/hooks/commit-msg
 - The reviewer checks: CI status, correctness, style, and architecture alignment.
 - **Approved**: the reviewer found no issues and considers the code ready to merge. An approved review must not contain any comments — it should be clean.
 - **Changes requested**: the review must include comments so the pull request author knows exactly where the issue is.
-- Once a pull request has two approving reviews, it must be merged by the author of the last approval.
+- Once a pull request has two approving reviews, it must be merged by the author of the last approval. 
