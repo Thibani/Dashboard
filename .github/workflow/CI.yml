@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+mirror-to-epitech:
+    runs-on: ubuntu-latest
+    needs: build-and-check
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      github.repository == 'Thibani/Dashboard'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EPITECH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Push mirror to Epitech
+        run: |
+          git remote add epitech git@github.com:EpitechPGE3-2026/G-WEB-500-STG-5-1-dashboard-3.git
+          git push --mirror epitech
