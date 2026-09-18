@@ -33,7 +33,6 @@ Closes #<!-- issue number -->
 
 <!-- Complete all items before requesting a review -->
 
-- [ ] I built the project locally and all three binaries compile (`make zappy_server`, `make zappy_gui`, `make zappy_ai`)
 - [ ] My commits follow the team's commit convention (type, scope, description)
 - [ ] The PR title follows the commit convention (e.g. `feat(server): add player movement`)
 - [ ] I updated relevant documentation if needed (README, docs/, comments)
