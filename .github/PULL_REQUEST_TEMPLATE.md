@@ -11,8 +11,7 @@
 <!-- Check the relevant box -->
 
 - [ ] `server`
-- [ ] `gui`
-- [ ] `ai`
+- [ ] `frontend`
 - [ ] `ci`
 - [ ] `docs`
 - [ ] `other` <!-- specify: -->
