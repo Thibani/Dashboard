@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
+import { runMigrations } from "./db";
 
 dotenv.config();
 
@@ -63,6 +64,11 @@ app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+async function start() {
+  await runMigrations();
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+}
+
+start();
