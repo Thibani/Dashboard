@@ -10,8 +10,8 @@
 
 <!-- Check the relevant box -->
 
-- [ ] `server`
-- [ ] `front`
+- [ ] `backend`
+- [ ] `frontend`
 - [ ] `ci`
 - [ ] `docs`
 - [ ] `other` <!-- specify: -->
