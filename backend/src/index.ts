@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { aboutRouter } from "./routes/about";
+import { widgetsRouter } from "./routes/widgets";
+import { errorHandler } from "./middleware/error-handler";
 import type { Request, Response } from "express";
 import { runMigrations } from "./db";
 
@@ -11,6 +14,11 @@ const PORT = Number(process.env.PORT) || 8080;
 
 app.use(cors());
 app.use(express.json());
+
+app.use(aboutRouter);
+app.use(widgetsRouter);
+
+app.use(errorHandler);
 
 // --- Service/widget registry ------------------------------------------
 
