@@ -1,0 +1,109 @@
+/* ==========================================================================
+   components/layout/Header.tsx
+   Persistent top bar: brand on the left, profile/auth controls on the right.
+   ========================================================================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.app-header-brand {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.app-header-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.app-header-auth-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.app-header-auth-links a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.app-header-auth-links a:hover {
+  color: var(--text-h);
+}
+
+.app-header-cta {
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--bg) !important;
+  font-weight: 500;
+}
+
+.app-header-avatar {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header-menu {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.app-header-menu-email {
+  font-size: 13px;
+  color: var(--text);
+  word-break: break-all;
+  margin: 0 0 4px;
+}
+
+.app-header-menu button {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.app-header-menu button:hover {
+  background: var(--code-bg);
+}
