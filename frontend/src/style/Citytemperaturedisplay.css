@@ -1,0 +1,17 @@
+.widget-big-number {
+  font-family: var(--heading);
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  color: var(--text-h);
+  margin: 0 0 4px;
+}
+
+.widget-body p {
+  margin: 2px 0;
+}
+
+.widget-body p:not(.widget-big-number) {
+  font-size: 14px;
+  color: var(--text);
+}

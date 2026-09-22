@@ -1,0 +1,9 @@
+.field input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field input[type="text"]::placeholder {
+  color: var(--text);
+  opacity: 0.5;
+}
