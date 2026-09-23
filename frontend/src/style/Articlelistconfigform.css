@@ -1,0 +1,13 @@
+.field + .field {
+  margin-top: 12px;
+}
+
+.field input[type="url"],
+.field input[type="number"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field input[type="number"] {
+  max-width: 100px;
+}

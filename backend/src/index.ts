@@ -6,7 +6,7 @@ import { widgetsRouter } from "./routes/widgets";
 import { errorHandler } from "./middleware/error-handler";
 import type { Request, Response } from "express";
 import { runMigrations } from "./db";
-import router from "./routes/auth"
+import authRouter from "./routes/auth";
 
 dotenv.config();
 
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(aboutRouter);
 app.use(widgetsRouter);
 
-app.use(router);
+app.use("/api/auth", authRouter);
 app.use(errorHandler);
 
 // --- Service/widget registry ------------------------------------------
