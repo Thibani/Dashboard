@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, createUser } from "../models/user";
+import { findUserByEmail, createUser, generateVerificationToken, saveVerificationToken, verifyUserToken, confirmUser } from "../models/user";
 import type { Request, Response } from "express";
+import { sendVerificationEmail } from "../services/email";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d";
@@ -20,7 +21,10 @@ export async function register(req: Request, res: Response) {
     return res.status(400).json({ message: "This email already exists" });
   }
   const hashedPassword = await bcrypt.hash(password, 10);
-  await createUser(email, hashedPassword);
+  const user = await createUser(email, hashedPassword);
+  const token = generateVerificationToken();
+  await saveVerificationToken(user.id, token);
+  await sendVerificationEmail(email, token);
   return res.status(201).json({ message: "Account created successfully" });
 }
 
@@ -46,4 +50,15 @@ export async function login(req: Request, res: Response) {
     token,
     user: { email: user.email },
   });
+}
+
+export async function verifyAccount(req: Request, res: Response) {
+  const token = req.query.token as string;
+  const user = await verifyUserToken(token);
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired verification token." });
+  }
+  await confirmUser(user.id);
+  return res.status(200).json({ message: "Account successfully verified."});
 }

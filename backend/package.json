@@ -9,12 +9,12 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.3",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^10.0.10",
     "pg": "^8.11.5",
     "rss-parser": "^3.13.0",
     "zod": "^3.23.8"
@@ -23,7 +23,9 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.43",
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.23.13",
