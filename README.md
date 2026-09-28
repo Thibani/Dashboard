@@ -35,7 +35,7 @@ The reasons behind these choices are in the [Developer guide](docs/DEVELOPER_GUI
 **Prerequisites:** [Docker](https://docs.docker.com/get-docker/) with Compose (`docker compose version` should print a version).
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Thibani/Dashboard.git
 cd Dashboard (repository name)
 ```
 

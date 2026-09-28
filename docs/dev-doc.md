@@ -60,7 +60,7 @@ The browser downloads the React application from `client`, then talks to `server
 **Prerequisites:** Docker with Compose. Check with `docker --version` and `docker compose version`.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Thibani/Dashboard.git
 cd Dashboard (repository name)
 ```
 
