@@ -1,13 +1,13 @@
 import { useState, type SyntheticEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { loginRequest, registerRequest } from "../lib/api";
+import { Link } from "react-router-dom";
+import { registerRequest } from "../lib/api";
 
 export function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   async function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
@@ -15,13 +15,27 @@ export function Register() {
     setSubmitting(true);
     try {
       await registerRequest(email, password);
-      await loginRequest(email, password);
-      navigate("/");
+      setRegisteredEmail(email);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create account");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (registeredEmail) {
+    return (
+      <div className="auth-page">
+        <div className="auth-status">
+          <h1>Check your email</h1>
+          <p>
+            We sent a confirmation link to <strong>{registeredEmail}</strong>. Open it to activate your
+            account, then log in. The link expires in 24 hours.
+          </p>
+          <Link to="/login">Go to log in</Link>
+        </div>
+      </div>
+    );
   }
 
   return (

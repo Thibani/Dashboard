@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, createUser, generateVerificationToken, saveVerificationToken, verifyUserToken, confirmUser } from "../models/user";
+import { findUserByEmail, createUser, updateUserPassword, generateVerificationToken, saveVerificationToken, verifyUserToken, confirmUser } from "../models/user";
 import type { Request, Response } from "express";
 import { sendVerificationEmail } from "../services/email";
 
@@ -17,13 +17,22 @@ export async function register(req: Request, res: Response) {
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
-  if (await findUserByEmail(email) != undefined) {
+  const existing = await findUserByEmail(email);
+  if (existing && existing.is_confirmed) {
     return res.status(400).json({ message: "This email already exists" });
   }
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await createUser(email, hashedPassword);
+  // Unconfirmed account (e.g. the link expired): reuse it with the new password
+  // and send a fresh confirmation email instead of blocking the email address.
+  let userId: number;
+  if (existing) {
+    await updateUserPassword(existing.id, hashedPassword);
+    userId = existing.id;
+  } else {
+    userId = (await createUser(email, hashedPassword)).id;
+  }
   const token = generateVerificationToken();
-  await saveVerificationToken(user.id, token);
+  await saveVerificationToken(userId, token);
   await sendVerificationEmail(email, token);
   return res.status(201).json({ message: "Account created successfully" });
 }
@@ -41,6 +50,9 @@ export async function login(req: Request, res: Response) {
   const passwordMatches = await bcrypt.compare(password, user.password);
   if (!passwordMatches) {
     return res.status(401).json({ message: "Invalid email or password" });
+  }
+  if (!user.is_confirmed) {
+    return res.status(403).json({ message: "Please confirm your email before logging in" });
   }
   const token = jwt.sign({ sub: user.id, email: user.email, role: user.role }, JWT_SECRET as string, {
     expiresIn: JWT_EXPIRES_IN,
@@ -60,5 +72,5 @@ export async function verifyAccount(req: Request, res: Response) {
     return res.status(400).json({ message: "Invalid or expired verification token." });
   }
   await confirmUser(user.id);
-  return res.status(200).json({ message: "Account successfully verified."});
+  return res.status(200).json({ message: "Account successfully verified." });
 }

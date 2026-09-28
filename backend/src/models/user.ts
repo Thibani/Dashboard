@@ -33,3 +33,8 @@ export async function confirmUser(userId: number) {
     await pool.query
         ('UPDATE users SET is_confirmed = $1, token = NULL, date = NULL WHERE id = $2', [true, userId]);
 }
+
+export async function updateUserPassword(userId: number, password: string) {
+    await pool.query
+        ('UPDATE users SET password = $1 WHERE id = $2', [password, userId]);
+}
