@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS dashboards (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    instances JSONB NOT NULL DEFAULT '[]',
+    updated_at TIMESTAMP DEFAULT NOW()
+);
