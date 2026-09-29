@@ -1,4 +1,4 @@
-import { type AboutResponse } from "../features/widgets/types";
+import { type AboutResponse, type WidgetInstance } from "../features/widgets/types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -45,4 +45,32 @@ export async function registerRequest(email: string, password: string): Promise<
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.message || body.error || "Could not create account");
   return body;
+}
+
+export async function verifyRequest(token: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_URL}/api/auth/verify?token=${encodeURIComponent(token)}`);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || body.error || "Could not verify your account");
+  return body;
+}
+
+export class UnauthorizedError extends Error {}
+
+export async function fetchDashboard(token: string): Promise<WidgetInstance[]> {
+  const res = await fetch(`${API_URL}/api/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
+  if (!res.ok) throw new Error("Failed to load your dashboard");
+  return (await res.json()).instances;
+}
+
+export async function saveDashboard(token: string, instances: WidgetInstance[]): Promise<void> {
+  const res = await fetch(`${API_URL}/api/dashboard`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ instances }),
+  });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
+  if (!res.ok) throw new Error("Failed to save your dashboard");
 }

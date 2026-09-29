@@ -1,397 +1,92 @@
-# Dashboard — Docker
+# Dashboard
 
-This project can be run using Docker and Docker Compose.
+A customizable dashboard that gathers information from several sources in one place. Create an account, pick widgets from different services (weather, RSS…), configure them, and arrange them on a personal page that refreshes itself automatically.
 
-Docker allows you to run the frontend and backend in isolated containers without having to install all dependencies directly on your machine.
+## Features
 
-## Prerequisites
+- Account creation with **email confirmation**, then login
+- A personal dashboard **saved with your account**: you get the same widgets on any browser or device
+- Widgets with their **own configuration and refresh rate**: two instances of the same widget can show different data at the same time
+- Add, reconfigure, remove and **drag & drop** widgets
+- Responsive interface with light and dark themes (follows your system setting)
+- The server describes its services and widgets at `GET /about.json`
 
-You need to have Docker installed.
+## Services and widgets
 
-Check that Docker is available:
+| Service | Widget | Parameters | What it shows |
+| --- | --- | --- | --- |
+| `weather` | `city_temperature` | `city` (string) | Temperature and precipitation for a city |
+| `rss` | `article_list` | `link` (string), `number` (integer) | The latest articles of an RSS feed |
 
-```bash
-docker --version
-```
+## Tech stack
 
-Check Docker Compose:
+| Part | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, React Router, TanStack Query, dnd-kit |
+| Backend | Node.js, Express, TypeScript |
+| Database | PostgreSQL |
+| Auth | bcrypt (password hashing), JSON Web Tokens, email confirmation with Nodemailer |
+| Infrastructure | Docker Compose, nginx (serves the built frontend) |
 
-```bash
-docker compose version
-```
-
-If both commands return a version, Docker is ready to use.
-
----
-
-# Project structure
-
-The project contains:
-
-```text
-Dashboard/
-├── frontend/
-├── backend/
-├── docker-compose.yml
-└── README.md
-```
-
-Each part of the application can be run in its own Docker container.
-
----
-
-# Starting the project
-
-From the root of the project:
-
-```bash
-docker compose up
-```
-
-Docker Compose will:
-
-1. Build the required images if they do not already exist.
-2. Create the containers.
-3. Start the frontend and backend.
-4. Display the logs directly in the terminal.
-
-To start the containers in the background:
-
-```bash
-docker compose up -d
-```
-
-The `-d` option means **detached mode**. The containers continue running while you can use your terminal normally.
-
----
-
-# Building the project
-
-To build the Docker images:
-
-```bash
-docker compose build
-```
-
-You can also build and start the project at the same time:
-
-```bash
-docker compose up --build
-```
-
-This is useful after changing a `Dockerfile` or dependencies.
-
-For example:
-
-```bash
-docker compose up --build -d
-```
-
-builds the images and starts the containers in the background.
-
----
-
-# Stopping the project
-
-To stop the running containers:
-
-```bash
-docker compose down
-```
-
-This stops and removes the containers created by Docker Compose.
-
-It does **not** delete your source code.
-
----
-
-# Viewing running containers
-
-To see the containers currently running:
-
-```bash
-docker compose ps
-```
-
-You can also use:
-
-```bash
-docker ps
-```
-
----
-
-# Viewing logs
-
-To see the logs of all services:
-
-```bash
-docker compose logs
-```
-
-To follow the logs in real time:
-
-```bash
-docker compose logs -f
-```
-
-To see the logs of only one service:
-
-```bash
-docker compose logs -f backend
-```
-
-or:
-
-```bash
-docker compose logs -f frontend
-```
-
-The exact service names depend on the `docker-compose.yml` file.
-
----
-
-# Rebuilding after changes
-
-If you modify the source code and the project uses Docker volumes for development, the changes may be detected automatically.
-
-If you modify dependencies or a `Dockerfile`, rebuild the containers:
-
-```bash
-docker compose up --build
-```
-
-If you want to completely recreate the containers:
-
-```bash
-docker compose down
-docker compose up --build
-```
-
----
-
-# Opening a shell inside a container
-
-You can open a shell inside a running container with:
-
-```bash
-docker compose exec backend sh
-```
-
-For the frontend:
-
-```bash
-docker compose exec frontend sh
-```
-
-Depending on the image, `bash` may be available instead:
-
-```bash
-docker compose exec backend bash
-```
-
-Once inside the container, commands are executed inside the Docker environment rather than directly on your computer.
-
-To leave the container:
-
-```bash
-exit
-```
-
----
-
-# Useful Docker commands
-
-## List all containers
-
-```bash
-docker ps -a
-```
-
-## List Docker images
-
-```bash
-docker images
-```
-
-## Remove unused containers
-
-```bash
-docker container prune
-```
-
-## Remove unused images
-
-```bash
-docker image prune
-```
-
-Be careful with cleanup commands because they remove Docker resources that are no longer being used.
-
----
-
-# Docker Compose commands summary
-
-| Command                           | Description                  |
-| --------------------------------- | ---------------------------- |
-| `docker compose up`               | Start the project            |
-| `docker compose up -d`            | Start in background          |
-| `docker compose up --build`       | Rebuild and start            |
-| `docker compose build`            | Build the images             |
-| `docker compose down`             | Stop and remove containers   |
-| `docker compose ps`               | Show project containers      |
-| `docker compose logs`             | Show logs                    |
-| `docker compose logs -f`          | Follow logs                  |
-| `docker compose exec backend sh`  | Open a shell in the backend  |
-| `docker compose exec frontend sh` | Open a shell in the frontend |
-
----
-
-# Typical workflow
-
-When starting work on the project:
-
-```bash
-docker compose up -d
-```
-
-Check that everything is running:
-
-```bash
-docker compose ps
-```
-
-If something goes wrong, check the logs:
-
-```bash
-docker compose logs -f
-```
-
-When you finish:
-
-```bash
-docker compose down
-```
-
-If you changed dependencies or Docker configuration:
-
-```bash
-docker compose down
-docker compose up --build -d
-```
-
----
-
-# Troubleshooting
-
-## Docker permission denied
-
-If Docker gives a permission error such as:
-
-```text
-permission denied while trying to connect to the Docker daemon
-```
-
-make sure Docker is running.
-
-You can check:
-
-```bash
-sudo systemctl status docker
-```
-
-If necessary:
-
-```bash
-sudo systemctl start docker
-```
-
-On Linux, you can also add your user to the Docker group:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-Then log out and log back in for the change to take effect.
-
----
-
-## Port already in use
-
-If Docker reports an error such as:
-
-```text
-bind: address already in use
-```
-
-another application is already using the required port.
-
-You can find which process is using a port with:
-
-```bash
-sudo lsof -i :8080
-```
-
-Replace `8080` with the port causing the problem.
-
-You can then stop the application using that port or change the port mapping in `docker-compose.yml`.
-
----
-
-## Container keeps restarting
-
-Check the logs:
-
-```bash
-docker compose logs backend
-```
-
-or:
-
-```bash
-docker compose logs frontend
-```
-
-The logs usually indicate why the application failed to start.
-
----
-
-# Important
-
-Do not normally use:
-
-```bash
-sudo npm install
-```
-
-inside the project.
-
-Docker containers have their own dependencies and environment. Install project dependencies according to the project's Docker configuration rather than changing ownership of project files unnecessarily.
-
-For normal development, Docker Compose should be the main entry point for starting the application.
+The reasons behind these choices are in the [Developer guide](docs/DEVELOPER_GUIDE.md#technology-choices).
 
 ## Quick start
 
-For most users, the entire project can be started with:
+**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) with Compose (`docker compose version` should print a version).
 
 ```bash
-docker compose up --build -d
+git clone https://github.com/Thibani/Dashboard.git
+cd Dashboard (repository name)
 ```
 
-Then check the containers:
+**1. Configure.** The server refuses to start without a secret used to sign login tokens. Create a `.env` file at the project root:
 
 ```bash
-docker compose ps
+# generate a value with: openssl rand -hex 32
+JWT_SECRET=replace-with-a-long-random-string
 ```
 
-And view the logs if necessary:
+Other settings are optional; see [Configuration](docs/DEVELOPER_GUIDE.md#configuration).
+
+**2. Build and run.**
 
 ```bash
-docker compose logs -f
+docker compose up --build
 ```
 
-To stop everything:
+`docker-compose` (with a hyphen, Compose v1) works the same way.
+
+**3. Open the app.**
+
+| What | URL |
+| --- | --- |
+| Web application | http://localhost:3000 |
+| API | http://localhost:8080 |
+| Services and widgets (JSON) | http://localhost:8080/about.json |
+
+**4. Create an account.** In this development setup the confirmation email goes to a test mailbox rather than a real inbox. The confirmation link is printed in the server logs:
 
 ```bash
-docker compose down
+docker compose logs server | grep "Preview URL"
+```
+
+Open the printed URL, click the confirmation link in the message, then log in.
+
+**Stop:** `docker compose down`. Add `-v` to also delete the database.
+
+## Documentation
+
+| Guide | For |
+| --- | --- |
+| [User guide](docs/USER_GUIDE.md) | Using the application: account, widgets, troubleshooting |
+| [Developer guide](docs/DEVELOPER_GUIDE.md) | Architecture, API, database, adding a widget, Docker commands |
+
+## Project structure
+
+```text
+Dashboard/
+├── frontend/            React application
+├── backend/             Express API
+├── docker-compose.yml
+└── README.md
 ```

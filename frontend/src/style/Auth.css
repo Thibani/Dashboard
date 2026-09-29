@@ -68,3 +68,26 @@
 .auth-switch a {
   color: var(--accent);
 }
+
+/* Status panels: "check your email" and the /verify result */
+.auth-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  max-width: 360px;
+}
+
+.auth-status h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.auth-status p {
+  font-size: 14px;
+}
+
+.auth-status a {
+  color: var(--accent);
+}

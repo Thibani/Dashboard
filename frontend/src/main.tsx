@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dashboard } from "./routes/Dashboard";
 import { Login } from "./routes/Login";
 import { Register } from "./routes/Register";
+import { Verify } from "./routes/Verify";
 import { Layout } from "./components/layout/Layout";
 import { RequireAuth } from "./components/layout/RequireAuth";
 import { AuthProvider } from "./context/AuthContext";
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "/", element: <RequireAuth><Dashboard /></RequireAuth> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+      { path: "/verify", element: <Verify /> },
     ],
   },
 ]);

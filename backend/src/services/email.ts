@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 
 // smtp c'est l'équivalent du http mais pour les mails
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 export async function sendVerificationEmail(email: string, token: string) {
     const testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
@@ -16,7 +18,7 @@ export async function sendVerificationEmail(email: string, token: string) {
         from: "no-reply@dashboard.com",
         to: email,
         subject: "Account verification",
-        text: `Click here to confirm your account: http://localhost:8080/api/auth/verify?token=${token}`
+        text: `Click here to confirm your account: ${FRONTEND_URL}/verify?token=${token}`
     });
     console.log("Preview URL:", nodemailer.getTestMessageUrl(res));
 }
