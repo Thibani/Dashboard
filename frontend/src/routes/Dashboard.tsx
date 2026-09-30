@@ -8,17 +8,103 @@ import { useAuth } from "../context/AuthContext";
 import { type AboutResponse, type WidgetInstance } from "../features/widgets/types";
 import { WidgetShell } from "../features/widgets/WidgetShell";
 import { AddWidgetDialog } from "../features/widgets/AddWidgetDialog";
+import '../style/Dashboard.css'
 
-function SortableWidget({ instance, onRemove, onEdit }: {
+function SortableWidget({
+  instance,
+  onRemove,
+  onEdit,
+  onResize,
+}: {
   instance: WidgetInstance;
   onRemove: (id: string) => void;
   onEdit: (instance: WidgetInstance) => void;
+  onResize: (id: string, width: number, height: number) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: instance.id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: instance.id });
+
+  const width = instance.width ?? 1;
+  const height = instance.height ?? 1;
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    gridColumn: `span ${width}`,
+    gridRow: `span ${height}`,
+  };
+
   return (
-    <div ref={setNodeRef} style={style}>
-      <WidgetShell instance={instance} onRemove={onRemove} onEdit={onEdit} dragHandleProps={{ ...attributes, ...listeners }} />
+    <div ref={setNodeRef} style={style} className="sortable-widget">
+      <WidgetShell
+        instance={instance}
+        onRemove={onRemove}
+        onEdit={onEdit}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+
+      <div
+        className="widget-resize-handle"
+        onPointerDown={(event) => {
+          event.stopPropagation();
+
+          const startX = event.clientX;
+          const startY = event.clientY;
+
+          const startWidth = width;
+          const startHeight = height;
+
+          const grid = event.currentTarget.parentElement?.parentElement;
+
+          if (!grid) return;
+
+          const gridRect = grid.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(grid);
+
+          const columns = computedStyle.gridTemplateColumns.split(" ").length;
+          const columnGap = parseFloat(computedStyle.columnGap) || 0;
+          const rowGap = parseFloat(computedStyle.rowGap) || 0;
+
+          const columnWidth =
+            (gridRect.width - columnGap * (columns - 1)) / columns;
+
+          const rowHeight =
+            parseFloat(computedStyle.gridAutoRows) || 180;
+
+          const handlePointerMove = (moveEvent: PointerEvent) => {
+            const deltaX = moveEvent.clientX - startX;
+            const deltaY = moveEvent.clientY - startY;
+
+            const columnChange = Math.round(
+              deltaX / (columnWidth + columnGap)
+            );
+
+            const rowChange = Math.round(
+              deltaY / (rowHeight + rowGap)
+            );
+
+            const newWidth = Math.min(
+              columns,
+              Math.max(1, startWidth + columnChange)
+            );
+
+            const newHeight = Math.max(
+              1,
+              startHeight + rowChange
+            );
+
+            onResize(instance.id, newWidth, newHeight);
+          };
+
+          const handlePointerUp = () => {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+          };
+
+          window.addEventListener("pointermove", handlePointerMove);
+          window.addEventListener("pointerup", handlePointerUp);
+        }}
+      />
     </div>
   );
 }
@@ -86,8 +172,21 @@ function DashboardContent({ about, initialInstances, token, onUnauthorized }: Da
               <SortableWidget
                 key={instance.id}
                 instance={instance}
-                onRemove={(id) => setInstances((prev) => prev.filter((i) => i.id !== id))}
-                onEdit={(inst) => setDialogState({ open: true, editing: inst })}
+                onRemove={(id) =>
+                  setInstances((prev) => prev.filter((i) => i.id !== id))
+                }
+                onEdit={(inst) =>
+                  setDialogState({ open: true, editing: inst })
+                }
+                onResize={(id, width, height) => {
+                  setInstances((prev) =>
+                    prev.map((instance) =>
+                      instance.id === id
+                        ? { ...instance, width, height }
+                        : instance
+                    )
+                  );
+                }}
               />
             ))}
           </div>

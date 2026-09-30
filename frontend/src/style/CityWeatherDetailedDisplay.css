@@ -1,0 +1,152 @@
+.weather-detailed {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.weather-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.weather-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.weather-header p {
+  margin: 4px 0 0;
+  opacity: 0.7;
+}
+
+.weather-current-temperature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.weather-current-temperature:first-letter {
+  font-size: 1.5rem;
+}
+
+.weather-current {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.weather-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weather-stat-label {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.weather-stat-value {
+  font-weight: 500;
+}
+
+.weather-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weather-section h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.weather-hourly {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.weather-hour {
+  min-width: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.weather-hour-time {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.weather-hour-icon {
+  font-size: 1.2rem;
+}
+
+.weather-hour-temperature {
+  font-weight: 600;
+}
+
+.weather-hour-rain {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.weather-daily {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weather-day {
+  display: grid;
+  grid-template-columns: 70px 30px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-day-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.weather-day-icon {
+  font-size: 1.1rem;
+}
+
+.weather-day-description {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.weather-day-temperature {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.weather-day-rain {
+  grid-column: 3 / 5;
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+@media (max-width: 500px) {
+  .weather-day {
+    grid-template-columns: 60px 30px 1fr;
+  }
+
+  .weather-day-temperature {
+    grid-column: 3;
+  }
+
+  .weather-day-rain {
+    grid-column: 3;
+  }
+}
