@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/error-handler";
 import type { Request, Response } from "express";
 import { runMigrations } from "./db";
 import authRouter from "./routes/auth";
+import oauthRouter from "./routes/oauth";
 import dashboardRouter from "./routes/dashboard";
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(widgetsRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/auth", oauthRouter);
 app.use(errorHandler);
 
 // --- Service/widget registry ------------------------------------------
