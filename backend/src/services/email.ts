@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 // smtp c'est l'équivalent du http mais pour les mails
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:8080/api/auth";
 
 export async function sendVerificationEmail(email: string, token: string) {
     const testAccount = await nodemailer.createTestAccount();
