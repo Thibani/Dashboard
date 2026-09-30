@@ -35,6 +35,16 @@ const services = [
         description: "Display temperature for a city",
         params: [{ name: "city", type: "string" }],
       },
+      {
+          name: "city_meto_summary",
+          description: "Display a weather summary for a city",
+          params: [{ name: "city", type: "string" }],
+      },
+      {
+          name: "city_weather_detailed",
+          description: "Display detailed weather information for a city",
+          params: [{ name: "city", type: "string" }],
+      },
     ],
   },
   {

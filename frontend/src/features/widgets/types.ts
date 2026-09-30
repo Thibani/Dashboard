@@ -25,4 +25,6 @@ export interface WidgetInstance {
   widget: string;
   config: Record<string, unknown>;
   refreshRateSeconds: number;
+  width?: number;
+  height?: number;
 }
