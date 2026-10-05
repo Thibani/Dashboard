@@ -78,8 +78,8 @@ Open the printed URL, click the confirmation link in the message, then log in.
 
 | Guide | For |
 | --- | --- |
-| [User guide](docs/USER_GUIDE.md) | Using the application: account, widgets, troubleshooting |
-| [Developer guide](docs/DEVELOPER_GUIDE.md) | Architecture, API, database, adding a widget, Docker commands |
+| [User guide](docs/usr-doc.md) | Using the application: account, widgets, troubleshooting |
+| [Developer guide](docs/dev-doc.md) | Architecture, API, database, adding a widget, Docker commands |
 
 ## Project structure
 
