@@ -4,6 +4,7 @@ import { findUserByEmail, createUser, updateUserPassword, generateVerificationTo
 import type { Request, Response } from "express";
 import { sendVerificationEmail } from "../services/email";
 
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d";
 
