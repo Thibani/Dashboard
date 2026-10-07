@@ -5,20 +5,18 @@ import nodemailer from "nodemailer";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 export async function sendVerificationEmail(email: string, token: string) {
-    const testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
+        host: "smtp.resend.com",
         port: 587,
         auth: {
-            user: testAccount.user,
-            pass: testAccount.pass,
+            user: "resend",
+            pass: process.env.RESEND_API_KEY,
         },
     });
     const res = await transporter.sendMail({
-        from: "no-reply@dashboard.com",
+        from: 'onboarding@resend.dev',
         to: email,
         subject: "Account verification",
         text: `Click here to confirm your account: ${FRONTEND_URL}/verify?token=${token}`
     });
-    console.log("Preview URL:", nodemailer.getTestMessageUrl(res));
 }
