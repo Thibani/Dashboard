@@ -36,6 +36,25 @@ export async function loginRequest(email: string, password: string): Promise<{ t
   return body;
 }
 
+export async function deleteAccountRequest(token: string): Promise<void> {
+
+  const res = await fetch(`${API_URL}/api/auth/account`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.status === 401) {
+    throw new UnauthorizedError("Session expired");
+  }
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || body.error || "Failed to delete account");
+  }
+}
+
 export async function registerRequest(email: string, password: string): Promise<{ message: string }> {
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",

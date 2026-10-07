@@ -38,3 +38,12 @@ export async function updateUserPassword(userId: number, password: string) {
     await pool.query
         ('UPDATE users SET password = $1 WHERE id = $2', [password, userId]);
 }
+
+export async function deleteUser(userId: number) {
+  const result = await pool.query(
+    "DELETE FROM users WHERE id = $1",
+    [userId]
+  );
+
+  return result.rowCount;
+}
