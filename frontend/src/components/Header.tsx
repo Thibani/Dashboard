@@ -1,15 +1,50 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { deleteAccountRequest } from "../lib/api";
 
 function initialsFor(email: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
 export function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, token, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  async function handleDeleteAccount() {
+    if (!token) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account?\n\nThis action is permanent and cannot be undone."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+
+      await deleteAccountRequest(token);
+
+      logout();
+      navigate("/login");
+
+    } catch (error) {
+
+      console.error(error);
+
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete your account."
+      );
+
+    }
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -41,7 +76,14 @@ export function Header() {
             {menuOpen && (
               <div className="app-header-menu">
                 <p className="app-header-menu-email">{user.email}</p>
-                <button onClick={logout}>Log out</button>
+
+                <button onClick={logout}>
+                  Log out
+                </button>
+
+                <button onClick={handleDeleteAccount}>
+                  Delete account
+                </button>
               </div>
             )}
           </>
