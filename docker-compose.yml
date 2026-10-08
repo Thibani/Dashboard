@@ -20,6 +20,7 @@ services:
   # NOTE: this service must be named/served so that the subject's
   # mandatory check (GET http://localhost:8080/about.json) passes.
   server:
+    env_file: .env
     build:
       context: ./backend
       target: ${BUILD_TARGET:-production}
@@ -37,6 +38,7 @@ services:
         condition: service_healthy
 
   client:
+    env_file: .env
     build:
       context: ./frontend
       target: ${BUILD_TARGET:-production}
