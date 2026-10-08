@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p tsconfig.json && cp -r src/migrations dist/migrations",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "jest"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -17,16 +18,19 @@
     "nodemailer": "^10.0.11",
     "pg": "^8.11.5",
     "rss-parser": "^3.13.0",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.43",
     "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.14",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.23.13",
     "typescript": "^5.9.3"
