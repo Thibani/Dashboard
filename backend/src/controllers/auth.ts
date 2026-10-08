@@ -5,6 +5,7 @@ import type { Request, Response } from "express";
 import { sendVerificationEmail } from "../services/email";
 import type { AuthedRequest } from "../middleware/auth";
 
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d";
 
