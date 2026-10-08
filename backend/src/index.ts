@@ -7,8 +7,8 @@ import { errorHandler } from "./middleware/error-handler";
 import type { Request, Response } from "express";
 import { runMigrations } from "./db";
 import authRouter from "./routes/auth";
-import oauthRouter from "./routes/oauth";
 import dashboardRouter from "./routes/dashboard";
+import { services } from "./services-registry";
 
 dotenv.config();
 
@@ -16,53 +16,14 @@ const app = express();
 const PORT = Number(process.env.PORT) || 8080;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 
 app.use(aboutRouter);
 app.use(widgetsRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/dashboard", dashboardRouter);
-app.use("/api/auth", oauthRouter);
 app.use(errorHandler);
-
-// --- Service/widget registry ------------------------------------------
-
-const services = [
-  {
-    name: "weather",
-    widgets: [
-      {
-        name: "city_temperature",
-        description: "Display temperature for a city",
-        params: [{ name: "city", type: "string" }],
-      },
-      {
-          name: "city_meto_summary",
-          description: "Display a weather summary for a city",
-          params: [{ name: "city", type: "string" }],
-      },
-      {
-          name: "city_weather_detailed",
-          description: "Display detailed weather information for a city",
-          params: [{ name: "city", type: "string" }],
-      },
-    ],
-  },
-  {
-    name: "rss",
-    widgets: [
-      {
-        name: "article_list",
-        description: "Displaying the list of the last articles",
-        params: [
-          { name: "link", type: "string" },
-          { name: "number", type: "integer" },
-        ],
-      },
-    ],
-  },
-];
 
 app.get("/about.json", (req: Request, res: Response) => {
   const forwardedFor = req.headers["x-forwarded-for"];
