@@ -53,5 +53,14 @@ export async function createUserFromGithub(email: string, id: number) {
 
 export async function linkGithubId(userId: number, githubId: number) {
     await pool.query
-        ('UPDATE users SET github_id = $1 WHERE id = $2', [githubId, userId]);
+        ('UPDATE users SET github_id = $1 WHERE id = $2', [githubId, userId]);  
+}
+
+export async function deleteUser(userId: number) {
+  const result = await pool.query(
+    "DELETE FROM users WHERE id = $1",
+    [userId]
+  );
+
+  return result.rowCount;
 }

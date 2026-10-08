@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, createUser, updateUserPassword, generateVerificationToken, saveVerificationToken, verifyUserToken, confirmUser } from "../models/user";
+import { findUserByEmail, createUser, updateUserPassword, generateVerificationToken, saveVerificationToken, verifyUserToken, confirmUser, deleteUser } from "../models/user";
 import type { Request, Response } from "express";
 import { sendVerificationEmail } from "../services/email";
+import type { AuthedRequest } from "../middleware/auth";
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -74,4 +75,18 @@ export async function verifyAccount(req: Request, res: Response) {
   }
   await confirmUser(user.id);
   return res.status(200).json({ message: "Account successfully verified." });
+}
+
+export async function deleteAccount(req: AuthedRequest, res: Response) {
+  if (!req.userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const deleted = await deleteUser(req.userId);
+
+  if (deleted === 0) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  return res.status(204).send();
 }
