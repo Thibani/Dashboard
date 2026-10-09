@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type AboutResponse, type WidgetInstance } from "./types";
 import { getConfigForm } from "./registry";
+import { useConnections, useServiceProvider } from "../../hooks/useOAuth";
 import "../../style/AddWidgetDialog.css"
 
 interface AddWidgetDialogProps {
@@ -17,6 +18,11 @@ export function AddWidgetDialog({ about, editingInstance, onConfirm, onClose }: 
   const widget = service?.widgets.find((w) => w.name === widgetName);
   const [config, setConfig] = useState<Record<string, unknown>>(editingInstance?.config ?? {});
   const [refreshRate, setRefreshRate] = useState(editingInstance?.refreshRateSeconds ?? 300);
+
+  const provider = useServiceProvider(serviceName);
+  const connections = useConnections();
+  const needsConnection =
+    provider && connections.data && !connections.data.some((c) => c.provider === provider.name && !c.needsReconnect);
 
   const ConfigForm = widget ? getConfigForm(serviceName, widgetName) : undefined;
 
@@ -58,6 +64,11 @@ export function AddWidgetDialog({ about, editingInstance, onConfirm, onClose }: 
         </label>
 
         {widget && <p className="field-hint">{widget.description}</p>}
+        {needsConnection && (
+          <p className="field-hint">
+            Needs your {provider.label} account: the widget will ask you to connect it.
+          </p>
+        )}
 
         {ConfigForm ? <ConfigForm value={config} onChange={setConfig} /> : <p className="widget-error">No config form for this widget yet.</p>}
 

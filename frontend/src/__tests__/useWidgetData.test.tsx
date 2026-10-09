@@ -2,11 +2,15 @@ import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useWidgetData } from "./useWidgetData";
+import { useWidgetData } from "../hooks/useWidgetData";
 import { fetchWidgetData } from "../lib/api";
 import type { WidgetInstance } from "../features/widgets/types";
 
-vi.mock("../lib/api", () => ({ fetchWidgetData: vi.fn() }));
+vi.mock("../lib/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../lib/api")>()),
+  fetchWidgetData: vi.fn(),
+}));
+vi.mock("../context/AuthContext", () => ({ useAuth: () => ({ token: "tok" }) }));
 
 function wrapper() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -26,17 +30,17 @@ const base: WidgetInstance = {
 describe("useWidgetData", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("fetches with the instance's service, widget and config", async () => {
+  it("fetches with the session token and the instance's service, widget and config", async () => {
     vi.mocked(fetchWidgetData).mockResolvedValue({ temp: 20 });
     const { result } = renderHook(() => useWidgetData(base), { wrapper: wrapper() });
 
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => expect(result.current.data).toEqual({ temp: 20 }));
-    expect(fetchWidgetData).toHaveBeenCalledWith("weather", "city_temperature", { city: "Paris" });
+    expect(fetchWidgetData).toHaveBeenCalledWith("tok", "weather", "city_temperature", { city: "Paris" });
   });
 
   it("fetches again when the config changes (two configs = two datasets)", async () => {
-    vi.mocked(fetchWidgetData).mockImplementation(async (_s, _w, config) => ({ city: config.city }));
+    vi.mocked(fetchWidgetData).mockImplementation(async (_t, _s, _w, config) => ({ city: config.city }));
     const { result, rerender } = renderHook(({ instance }) => useWidgetData(instance), {
       wrapper: wrapper(),
       initialProps: { instance: base },

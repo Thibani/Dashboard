@@ -8,14 +8,32 @@ export async function fetchAbout(): Promise<AboutResponse> {
   return res.json();
 }
 
-export async function fetchWidgetData(service: string, widget: string, config: Record<string, unknown>) {
-  const res = await fetch(`${API_URL}/widgets/preview`, {
+// The widget's service needs a GitHub/Google account the user hasn't connected
+// (or whose access was revoked): the widget shows a "Connect" button instead.
+export class ProviderNotConnectedError extends Error {
+  provider: string;
+
+  constructor(message: string, provider: string) {
+    super(message);
+    this.provider = provider;
+  }
+}
+
+export async function fetchWidgetData(
+  token: string,
+  service: string,
+  widget: string,
+  config: Record<string, unknown>
+) {
+  const res = await fetch(`${API_URL}/api/widgets/data`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ service, widget, config }),
   });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    if (body.code === "provider_not_connected") throw new ProviderNotConnectedError(body.error, body.provider);
     throw new Error(body.error || "Widget request failed");
   }
   return (await res.json()).data;
@@ -92,4 +110,61 @@ export async function saveDashboard(token: string, instances: WidgetInstance[]):
   });
   if (res.status === 401) throw new UnauthorizedError("Session expired");
   if (!res.ok) throw new Error("Failed to save your dashboard");
+}
+
+export interface OAuthProviderInfo {
+  name: string;
+  label: string;
+  configured: boolean;
+  /** Dashboard services whose widgets need this account. */
+  services: string[];
+}
+
+export interface OAuthConnection {
+  provider: string;
+  needsReconnect: boolean;
+}
+
+/** A real browser navigation (not fetch): the provider's consent page must open in the tab. */
+export function oauthLoginUrl(provider: string) {
+  return `${API_URL}/api/oauth/${encodeURIComponent(provider)}`;
+}
+
+export async function fetchOAuthProviders(): Promise<OAuthProviderInfo[]> {
+  const res = await fetch(`${API_URL}/api/oauth/providers`);
+  if (!res.ok) throw new Error("Failed to load sign-in providers");
+  return (await res.json()).providers;
+}
+
+export async function fetchConnections(token: string): Promise<OAuthConnection[]> {
+  const res = await fetch(`${API_URL}/api/oauth/connections`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
+  if (!res.ok) throw new Error("Failed to load your connected accounts");
+  return (await res.json()).connections;
+}
+
+/** Returns the URL to send the browser to so the user can link this provider account. */
+export async function startOAuthLink(token: string, provider: string): Promise<string> {
+  const res = await fetch(`${API_URL}/api/oauth/${encodeURIComponent(provider)}/link`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || body.error || "Could not start the connection");
+  return body.url;
+}
+
+export async function disconnectProvider(token: string, provider: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/oauth/${encodeURIComponent(provider)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) throw new UnauthorizedError("Session expired");
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || body.error || "Could not disconnect this account");
+  }
 }

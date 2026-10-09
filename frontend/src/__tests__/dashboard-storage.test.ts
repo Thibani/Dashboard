@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadInstances, saveInstances } from "./dashboard-storage";
+import { loadInstances, saveInstances } from "../lib/dashboard-storage";
 
 const instance = { id: "1", service: "weather", widget: "w", config: {}, refreshRateSeconds: 60 };
 

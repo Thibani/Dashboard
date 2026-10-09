@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Verify } from "./Verify";
+import { Verify } from "../routes/Verify";
 import { verifyRequest } from "../lib/api";
 
 vi.mock("../lib/api", () => ({ verifyRequest: vi.fn() }));

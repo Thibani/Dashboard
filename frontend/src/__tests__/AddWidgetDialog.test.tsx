@@ -1,12 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AddWidgetDialog } from "./AddWidgetDialog";
-import { getConfigForm } from "./registry";
-import type { AboutResponse, WidgetInstance } from "./types";
-import type { WidgetConfigFormProps } from "./widget-component-types";
+import { AddWidgetDialog } from "../features/widgets/AddWidgetDialog";
+import { getConfigForm } from "../features/widgets/registry";
+import type { AboutResponse, WidgetInstance } from "../features/widgets/types";
+import type { WidgetConfigFormProps } from "../features/widgets/widget-component-types";
 
-vi.mock("./registry", () => ({ getConfigForm: vi.fn() }));
+vi.mock("../features/widgets/registry", () => ({ getConfigForm: vi.fn() }));
+vi.mock("../hooks/useOAuth", () => ({
+  useServiceProvider: () => undefined,
+  useConnections: () => ({ data: [] }),
+}));
 
 const about: AboutResponse = {
   client: { host: "127.0.0.1" },

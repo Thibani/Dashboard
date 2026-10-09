@@ -93,7 +93,8 @@
   margin: 0 0 4px;
 }
 
-.app-header-menu button {
+.app-header-menu button,
+.app-header-menu a {
   align-self: flex-start;
   padding: 6px 10px;
   border: 1px solid var(--border);
@@ -104,6 +105,11 @@
   cursor: pointer;
 }
 
-.app-header-menu button:hover {
+.app-header-menu a {
+  text-decoration: none;
+}
+
+.app-header-menu button:hover,
+.app-header-menu a:hover {
   background: var(--code-bg);
 }

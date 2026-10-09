@@ -1,13 +1,15 @@
 import { ServiceDefinition } from "../types/widget";
 import weather from "./weather";
 import rss from "./rss";
+import github from "./github";
+import google from "./google";
 
 // --- Adding a new service --------------------------------------------
 // 1. Create ./<service-name>/index.ts exporting a ServiceDefinition
 // 2. Create ./<service-name>/widgets/*.ts exporting its WidgetDefinitions
 // 3. Add it to this array. That's it — /about.json, config validation,
 //    and the generic widget data route all pick it up automatically.
-const allServices: ServiceDefinition[] = [weather, rss];
+const allServices: ServiceDefinition[] = [weather, rss, github, google];
 
 export const registry = new Map<string, ServiceDefinition>(
   allServices.map((service) => [service.name, service])

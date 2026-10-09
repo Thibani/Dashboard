@@ -1,14 +1,20 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WidgetShell } from "./WidgetShell";
-import { useWidgetData } from "../../hooks/useWidgetData";
-import { getDisplay } from "./registry";
-import type { WidgetInstance } from "./types";
-import type { WidgetDisplayProps } from "./widget-component-types";
+import { WidgetShell } from "../features/widgets/WidgetShell";
+import { useWidgetData } from "../hooks/useWidgetData";
+import { getDisplay } from "../features/widgets/registry";
+import { ProviderNotConnectedError } from "../lib/api";
+import type { WidgetInstance } from "../features/widgets/types";
+import type { WidgetDisplayProps } from "../features/widgets/widget-component-types";
 
-vi.mock("../../hooks/useWidgetData", () => ({ useWidgetData: vi.fn() }));
-vi.mock("./registry", () => ({ getDisplay: vi.fn() }));
+vi.mock("../hooks/useWidgetData", () => ({ useWidgetData: vi.fn() }));
+vi.mock("../features/widgets/registry", () => ({ getDisplay: vi.fn() }));
+vi.mock("../features/oauth/ConnectPrompt", () => ({
+  ConnectPrompt: ({ provider, message }: { provider: string; message: string }) => (
+    <p>connect:{provider}:{message}</p>
+  ),
+}));
 
 const instance: WidgetInstance = {
   id: "w1",
@@ -56,6 +62,17 @@ describe("WidgetShell", () => {
     vi.mocked(useWidgetData).mockReturnValue({ data: undefined, isLoading: false, error: new Error("nope") } as never);
     render(<WidgetShell instance={instance} onRemove={onRemove} onEdit={onEdit} />);
     expect(screen.getByText("error:nope")).toBeInTheDocument();
+  });
+
+  it("asks to connect the account instead of showing the display when it is not connected", () => {
+    vi.mocked(useWidgetData).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new ProviderNotConnectedError("Connect your GitHub account", "github"),
+    } as never);
+    render(<WidgetShell instance={instance} onRemove={onRemove} onEdit={onEdit} />);
+    expect(screen.getByText("connect:github:Connect your GitHub account")).toBeInTheDocument();
+    expect(screen.queryByText(/^error:/)).not.toBeInTheDocument();
   });
 
   it("shows a fallback when no display is registered", () => {

@@ -8,6 +8,7 @@ import type { Request, Response } from "express";
 import { runMigrations } from "./db";
 import authRouter from "./routes/auth";
 import dashboardRouter from "./routes/dashboard";
+import oauthRouter from "./routes/oauth";
 import { services } from "./services-registry";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(widgetsRouter);
 
 app.use("/api/auth", authRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/oauth", oauthRouter);
 app.use(errorHandler);
 
 app.get("/about.json", (req: Request, res: Response) => {

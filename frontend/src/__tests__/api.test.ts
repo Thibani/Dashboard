@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  disconnectProvider,
   fetchAbout,
+  fetchConnections,
+  oauthLoginUrl,
+  ProviderNotConnectedError,
+  startOAuthLink,
   fetchDashboard,
   fetchWidgetData,
   loginRequest,
@@ -8,7 +13,7 @@ import {
   saveDashboard,
   UnauthorizedError,
   verifyRequest,
-} from "./api";
+} from "../lib/api";
 
 const API = "http://localhost:8080";
 
@@ -40,15 +45,15 @@ describe("fetchAbout", () => {
 });
 
 describe("fetchWidgetData", () => {
-  it("POSTs service, widget and config, and returns `data`", async () => {
+  it("POSTs service, widget and config with the bearer token, and returns `data`", async () => {
     const fetchMock = mockFetch({ data: { temp: 21 } });
-    const result = await fetchWidgetData("weather", "city_temperature", { city: "Paris" });
+    const result = await fetchWidgetData("tok", "weather", "city_temperature", { city: "Paris" });
 
     expect(result).toEqual({ temp: 21 });
     const [url, options] = fetchMock.mock.calls[0];
-    expect(url).toBe(`${API}/widgets/preview`);
+    expect(url).toBe(`${API}/api/widgets/data`);
     expect(options.method).toBe("POST");
-    expect(options.headers).toEqual({ "Content-Type": "application/json" });
+    expect(options.headers).toEqual({ "Content-Type": "application/json", Authorization: "Bearer tok" });
     expect(JSON.parse(options.body)).toEqual({
       service: "weather",
       widget: "city_temperature",
@@ -58,12 +63,28 @@ describe("fetchWidgetData", () => {
 
   it("uses the server's `error` field when present", async () => {
     mockFetch({ error: "City not found" }, { ok: false, status: 404 });
-    await expect(fetchWidgetData("weather", "x", {})).rejects.toThrow("City not found");
+    await expect(fetchWidgetData("tok", "weather", "x", {})).rejects.toThrow("City not found");
   });
 
   it("falls back to a generic message when the body is not JSON", async () => {
     mockFetch(null, { ok: false, status: 502, jsonFails: true });
-    await expect(fetchWidgetData("weather", "x", {})).rejects.toThrow("Widget request failed");
+    await expect(fetchWidgetData("tok", "weather", "x", {})).rejects.toThrow("Widget request failed");
+  });
+
+  it("throws ProviderNotConnectedError, with the provider, when the account is not connected", async () => {
+    mockFetch(
+      { error: "Connect your GitHub account to use this widget", code: "provider_not_connected", provider: "github" },
+      { ok: false, status: 409 }
+    );
+    const error = await fetchWidgetData("tok", "github", "repositories", { number: 5 }).catch((e) => e);
+    expect(error).toBeInstanceOf(ProviderNotConnectedError);
+    expect(error.provider).toBe("github");
+    expect(error.message).toBe("Connect your GitHub account to use this widget");
+  });
+
+  it("throws UnauthorizedError on 401", async () => {
+    mockFetch({}, { ok: false, status: 401 });
+    await expect(fetchWidgetData("tok", "weather", "x", {})).rejects.toBeInstanceOf(UnauthorizedError);
   });
 });
 
@@ -182,5 +203,37 @@ describe("saveDashboard", () => {
   it("throws on other failures", async () => {
     mockFetch({}, { ok: false, status: 500 });
     await expect(saveDashboard("tok", instances)).rejects.toThrow("Failed to save your dashboard");
+  });
+});
+
+describe("oauth", () => {
+  it("builds the login URL the browser navigates to", () => {
+    expect(oauthLoginUrl("github")).toBe(`${API}/api/oauth/github`);
+  });
+
+  it("fetchConnections sends the bearer token and returns the connections", async () => {
+    const fetchMock = mockFetch({ connections: [{ provider: "github", needsReconnect: false }] });
+    await expect(fetchConnections("tok")).resolves.toEqual([{ provider: "github", needsReconnect: false }]);
+    expect(fetchMock.mock.calls[0][0]).toBe(`${API}/api/oauth/connections`);
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: "Bearer tok" });
+  });
+
+  it("startOAuthLink POSTs with the bearer token and returns the URL to open", async () => {
+    const fetchMock = mockFetch({ url: `${API}/api/oauth/google?link=ticket` });
+    await expect(startOAuthLink("tok", "google")).resolves.toBe(`${API}/api/oauth/google?link=ticket`);
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe(`${API}/api/oauth/google/link`);
+    expect(options.method).toBe("POST");
+    expect(options.headers).toEqual({ Authorization: "Bearer tok" });
+  });
+
+  it("disconnectProvider surfaces the server's message", async () => {
+    mockFetch({ message: "This is the only way you can sign in" }, { ok: false, status: 400 });
+    await expect(disconnectProvider("tok", "github")).rejects.toThrow("This is the only way you can sign in");
+  });
+
+  it("disconnectProvider throws UnauthorizedError on 401", async () => {
+    mockFetch({}, { ok: false, status: 401 });
+    await expect(disconnectProvider("tok", "github")).rejects.toBeInstanceOf(UnauthorizedError);
   });
 });

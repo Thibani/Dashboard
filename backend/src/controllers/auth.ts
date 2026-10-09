@@ -5,7 +5,6 @@ import type { Request, Response } from "express";
 import { sendVerificationEmail } from "../services/email";
 import type { AuthedRequest } from "../middleware/auth";
 
-
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "7d";
 
@@ -35,7 +34,13 @@ export async function register(req: Request, res: Response) {
     }
     const token = generateVerificationToken();
     await saveVerificationToken(userId, token);
-    await sendVerificationEmail(email, token);
+    try {
+        await sendVerificationEmail(email, token);
+    } catch (err) {
+        // Without this, the rejection is unhandled and Node kills the whole server.
+        console.error("Could not send the verification email:", err);
+        return res.status(502).json({ message: "Could not send the confirmation email. Please try again later." });
+    }
     return res.status(201).json({ message: "Account created successfully" });
 }
 
@@ -48,6 +53,10 @@ export async function login(req: Request, res: Response) {
     const user = await findUserByEmail(email);
     if (!user) {
         return res.status(401).json({ message: "Invalid email or password" });
+    }
+    // Accounts created through GitHub/Google have no password.
+    if (!user.password) {
+        return res.status(401).json({ message: "This account uses GitHub or Google sign-in" });
     }
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
@@ -79,16 +88,14 @@ export async function verifyAccount(req: Request, res: Response) {
     await confirmUser(user.id);
     return res.status(200).json({ message: "Account successfully verified." });
 }
+
 export async function deleteAccount(req: AuthedRequest, res: Response) {
-  if (!req.userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const deleted = await deleteUser(req.userId);
-
-  if (deleted === 0) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  return res.status(204).send();
+    if (!req.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const deleted = await deleteUser(req.userId);
+    if (deleted === 0) {
+        return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(204).send();
 }
