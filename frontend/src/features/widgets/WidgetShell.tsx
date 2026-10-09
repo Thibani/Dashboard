@@ -1,6 +1,7 @@
 import { useWidgetData } from "../../hooks/useWidgetData";
 import { ProviderNotConnectedError } from "../../lib/api";
 import { ConnectPrompt } from "../oauth/ConnectPrompt";
+import { ServiceIcon } from "../../components/ServiceIcon";
 import { getDisplay } from "./registry";
 import { type WidgetInstance } from "./types";
 import "../../style/WidgetShell.css"
@@ -17,9 +18,10 @@ export function WidgetShell({ instance, onRemove, onEdit, dragHandleProps }: Wid
   const Display = getDisplay(instance.service, instance.widget);
 
   return (
-    <div className="widget-card">
+    <div className="widget-card" data-service={instance.service}>
       <div className="widget-header">
         <span className="widget-drag-handle" {...dragHandleProps}>⠿</span>
+        <ServiceIcon service={instance.service} size={18} />
         <span className="widget-title">{instance.service} · {instance.widget}</span>
         <div className="widget-actions">
           <button onClick={() => onEdit(instance)} aria-label="Edit widget">⚙</button>
