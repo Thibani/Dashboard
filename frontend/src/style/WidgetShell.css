@@ -1,34 +1,63 @@
+/* ==========================================================================
+   features/widgets/WidgetShell.tsx
+   The card around every widget. --service-color tints it per service.
+   ========================================================================== */
+
 .widget-card {
+  --service-color: var(--accent);
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.widget-card[data-service="weather"] { --service-color: #0ea5e9; }
+.widget-card[data-service="rss"] { --service-color: #f97316; }
+/* github and google set theirs in GitHubWidgets.css / GoogleWidgets.css. */
+
+/* Thin service-colored line on top of the card. */
+.widget-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--service-color);
+  opacity: 0.85;
 }
 
 .widget-card:hover {
-  border-color: var(--accent-border);
+  border-color: color-mix(in srgb, var(--service-color) 35%, var(--border));
+  box-shadow: var(--shadow);
 }
 
 .widget-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--code-bg);
+  padding: 12px 10px 8px 12px;
 }
 
 .widget-drag-handle {
   cursor: grab;
   color: var(--text);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
+  padding: 4px 2px;
+  border-radius: 6px;
+  opacity: 0.5;
   user-select: none;
   touch-action: none;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.widget-drag-handle:hover {
+  opacity: 1;
+  background: var(--surface-2);
 }
 
 .widget-drag-handle:active {
@@ -37,11 +66,16 @@
 
 .widget-title {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   text-align: left;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-h);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -50,48 +84,104 @@
 .widget-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.widget-card:hover .widget-actions,
+.widget-card:focus-within .widget-actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .widget-actions {
+    opacity: 1;
+  }
 }
 
 .widget-actions button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: none;
+  border-radius: 8px;
   background: transparent;
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .widget-actions button:hover {
-  background: var(--accent-bg);
-  border-color: var(--accent-border);
-  color: var(--accent);
+  background: var(--surface-2);
+  color: var(--text-h);
 }
 
+.widget-actions button[aria-label="Remove widget"]:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+/* Scrolls instead of cutting content when the widget is small. */
 .widget-body {
   flex: 1;
-  padding: 16px 12px;
-  text-align: center;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 16px 14px;
+  text-align: left;
+  color: var(--text-h);
+  font-size: 14px;
 }
 
 .widget-error {
-  color: #e5484d;
+  color: var(--danger);
   font-size: 14px;
   margin: 0;
 }
 
 .widget-footer {
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-top: 1px solid var(--border);
   font-size: 11px;
   color: var(--text);
-  opacity: 0.7;
+  opacity: 0.75;
   text-align: right;
+}
+
+/* ---- Shared building blocks used by the widget displays ---------------- */
+
+/* A small tile: label on top, value below (weather stats...). */
+.widget-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+
+.widget-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.widget-stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.widget-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
 }

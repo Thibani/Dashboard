@@ -1,0 +1,27 @@
+/* components/ServiceIcon.tsx */
+
+.service-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.service-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.service-icon-github {
+  color: #1f2328;
+}
+
+@media (prefers-color-scheme: dark) {
+  .service-icon-github {
+    color: #f0f6fc;
+  }
+}
+
+.service-icon-fallback {
+  border-radius: 50%;
+  background: var(--accent);
+}

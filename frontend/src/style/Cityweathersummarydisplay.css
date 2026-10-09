@@ -2,20 +2,21 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .city-weather-summary-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
 }
 
 .city-weather-summary-location {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .city-weather-summary-location p {
@@ -23,70 +24,75 @@
 }
 
 .city-weather-summary-city {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--text-h);
 }
 
 .city-weather-summary-country {
-  font-size: 0.8rem;
-  opacity: 0.6;
+  font-size: 12px;
+  color: var(--text);
 }
 
 .city-weather-summary-temperature {
-  font-size: 2.4rem;
-  font-weight: 600;
+  font-family: var(--heading);
+  font-size: clamp(32px, 3vw, 40px);
+  font-weight: 650;
+  letter-spacing: -1px;
   line-height: 1;
-  margin: 4px 0;
+  color: var(--text-h);
 }
 
 .city-weather-summary-condition {
-  font-size: 0.9rem;
-  opacity: 0.75;
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--service-color) 14%, transparent);
+  color: var(--text-h);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .city-weather-summary-range {
   display: flex;
-  gap: 8px;
-  font-size: 0.85rem;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-h);
 }
 
 .city-weather-summary-range-label {
-  opacity: 0.6;
+  color: var(--text);
 }
 
 .city-weather-summary-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  margin-top: 2px;
 }
 
+/* Same tiles as .widget-stat (WidgetShell.css). */
 .city-weather-summary-stat {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  min-width: 0;
 }
 
 .city-weather-summary-stat-label {
-  font-size: 0.75rem;
-  opacity: 0.6;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
 .city-weather-summary-stat-value {
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-@media (max-width: 400px) {
-  .city-weather-summary-header {
-    align-items: flex-start;
-  }
-
-  .city-weather-summary-temperature {
-    font-size: 2rem;
-  }
-
-  .city-weather-summary-stats {
-    grid-template-columns: 1fr 1fr;
-  }
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
 }
