@@ -5,6 +5,7 @@ import { disconnectProvider, UnauthorizedError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useConnectProvider, useConnections, useOAuthProviders } from "../hooks/useOAuth";
 import { oauthErrorMessage } from "../features/oauth/errors";
+import { ServiceIcon } from "../components/ServiceIcon";
 import "../style/OAuth.css";
 
 export function Connections() {
@@ -65,7 +66,8 @@ export function Connections() {
 
           return (
             <li key={p.name} className="connections-item">
-              <div>
+              <ServiceIcon service={p.name} size={32} />
+              <div className="connections-info">
                 <p className="connections-name">{p.label}</p>
                 <p className="connections-status" data-connected={!!connection && !connection.needsReconnect}>
                   {p.configured ? status : "Not available on this server"}

@@ -6,6 +6,7 @@ export default function CityWeatherSummaryConfigForm({ value, onChange }: Widget
     <label className="field">
       City
       <input
+        required
         type="text"
         value={(value.city as string) ?? ""}
         onChange={(e) => onChange({ ...value, city: e.target.value })}

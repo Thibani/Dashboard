@@ -1,43 +1,68 @@
+/* Lists shared by the RSS, GitHub and Google widgets. */
+
 .widget-subtitle {
-  font-family: var(--mono);
   font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text);
-  opacity: 0.75;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .widget-list {
   list-style: none;
-  margin: 0;
+  margin: 0 -8px;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   text-align: left;
-  max-height: 220px;
-  overflow-y: auto;
 }
 
 .widget-list li {
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
+  position: relative;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
 }
 
-.widget-list li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.widget-list li:hover {
+  background: var(--surface-2);
+}
+
+.widget-list li + li::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 8px;
+  right: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.widget-list li:hover::before,
+.widget-list li:hover + li::before {
+  opacity: 0;
 }
 
 .widget-list a {
   color: var(--text-h);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
   line-height: 135%;
+  overflow-wrap: anywhere;
 }
 
-.widget-list a:hover {
+/* The whole row is clickable, not only the text. */
+.widget-list a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.widget-list li:hover a {
   color: var(--accent);
-  text-decoration: underline;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -27,12 +27,14 @@ function SortableWidget({
   const width = instance.width ?? 1;
   const height = instance.height ?? 1;
 
+  // The span itself is set in CSS (Dashboard.css), capped to the number of
+  // columns the screen has, so a wide widget can't overflow on a tablet.
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    gridColumn: `span ${width}`,
-    gridRow: `span ${height}`,
-  };
+    "--w": width,
+    "--h": height,
+  } as CSSProperties;
 
   return (
     <div ref={setNodeRef} style={style} className="sortable-widget">
@@ -88,9 +90,10 @@ function SortableWidget({
               Math.max(1, startWidth + columnChange)
             );
 
-            const newHeight = Math.max(
-              1,
-              startHeight + rowChange
+            // Same limit as the backend validation (MAX_WIDGET_ROWS).
+            const newHeight = Math.min(
+              8,
+              Math.max(1, startHeight + rowChange)
             );
 
             onResize(instance.id, newWidth, newHeight);
@@ -193,7 +196,12 @@ function DashboardContent({ about, initialInstances, token, onUnauthorized }: Da
         </SortableContext>
       </DndContext>
 
-      {instances.length === 0 && <p className="dashboard-empty">No widgets yet — add one to get started.</p>}
+      {instances.length === 0 && (
+        <button className="dashboard-empty" onClick={() => setDialogState({ open: true })}>
+          <span className="dashboard-empty-plus" aria-hidden="true">+</span>
+          No widgets yet — add one to get started.
+        </button>
+      )}
 
       {dialogState.open && (
         <AddWidgetDialog about={about} editingInstance={dialogState.editing} onConfirm={handleConfirm} onClose={() => setDialogState({ open: false })} />

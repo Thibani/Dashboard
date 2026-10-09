@@ -25,10 +25,13 @@
 }
 
 .oauth-button {
-  display: block;
-  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--text-h);
   font-size: 14px;
@@ -39,7 +42,7 @@
 }
 
 .oauth-button:hover {
-  background: var(--code-bg);
+  background: var(--surface-2);
   border-color: var(--accent-border);
 }
 
@@ -57,6 +60,9 @@
 
 .connect-prompt button,
 .connections-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 7px 14px;
   border: 1px solid var(--accent-border);
   border-radius: 8px;
@@ -82,15 +88,16 @@
 
 .connections {
   width: 100%;
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 32px var(--gutter) 48px;
   box-sizing: border-box;
   text-align: left;
 }
 
 .connections h1 {
-  font-size: 28px;
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -0.6px;
   margin: 0 0 6px;
 }
 
@@ -114,10 +121,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.connections-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .connections-item p {
@@ -155,6 +168,45 @@
 }
 
 .connections-actions button.secondary:hover {
-  background: var(--code-bg);
+  background: var(--surface-2);
   color: var(--text-h);
+}
+
+@media (max-width: 479px) {
+  .connections-actions {
+    width: 100%;
+  }
+
+  .connections-actions button {
+    flex: 1;
+  }
+}
+
+/* Provider-branded connect buttons inside widgets. */
+.connect-prompt-github button {
+  border-color: rgba(31, 35, 40, 0.15);
+  background: #1f2328;
+  color: #fff;
+}
+
+.connect-prompt-github button:hover {
+  background: #32383f;
+  color: #fff;
+}
+
+.connect-prompt-github button .service-icon-github {
+  color: #fff;
+}
+
+.connect-prompt-google button {
+  border-color: #dadce0;
+  background: #fff;
+  color: #3c4043;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.connect-prompt-google button:hover {
+  background: #f8faff;
+  color: #3c4043;
+  border-color: #d2e3fc;
 }

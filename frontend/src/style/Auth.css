@@ -1,6 +1,6 @@
 /* ==========================================================================
-   routes/Login.tsx & routes/Register.tsx
-   Centered auth form used by both the login and register pages.
+   routes/Login.tsx, Register.tsx, Verify.tsx
+   Centered auth card.
    ========================================================================== */
 
 .auth-page {
@@ -8,32 +8,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 40px var(--gutter);
+  background:
+    radial-gradient(60% 50% at 50% 0%, var(--accent-bg), transparent 70%);
+}
+
+.auth-form,
+.auth-status {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(24px, 5vw, 36px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
 }
 
 .auth-form {
-  width: 100%;
-  max-width: 360px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
   text-align: left;
 }
 
-.auth-form h1 {
-  font-size: 24px;
+.auth-form h1,
+.auth-status h1 {
+  font-size: 26px;
+  letter-spacing: -0.6px;
   margin: 0 0 4px;
   text-align: center;
 }
 
 .auth-form input {
-  padding: 9px 10px;
+  width: 100%;
+  padding: 11px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--text-h);
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .auth-form input:focus {
@@ -44,14 +59,24 @@
 
 .auth-form button[type="submit"] {
   margin-top: 4px;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--bg);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 6px 16px -6px var(--accent-border);
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.auth-form button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.auth-form button[type="submit"]:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .auth-form button[type="submit"]:disabled {
@@ -61,33 +86,23 @@
 
 .auth-switch {
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text);
 }
 
-.auth-switch a {
+.auth-switch a,
+.auth-status a {
   color: var(--accent);
+  font-weight: 500;
 }
 
 /* Status panels: "check your email" and the /verify result */
 .auth-status {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 12px;
   text-align: center;
-  max-width: 360px;
-}
-
-.auth-status h1 {
-  font-size: 24px;
-  margin: 0;
 }
 
 .auth-status p {
-  font-size: 14px;
-}
-
-.auth-status a {
-  color: var(--accent);
+  font-size: 15px;
 }

@@ -121,6 +121,13 @@ describe("Dashboard", () => {
       expect(await screen.findByText(/No widgets yet/)).toBeInTheDocument();
     });
 
+    it("opens the add dialog when the empty state is clicked", async () => {
+      vi.mocked(fetchDashboard).mockResolvedValue([]);
+      renderDashboard();
+      await userEvent.click(await screen.findByRole("button", { name: /No widgets yet/ }));
+      expect(screen.getByText("adding")).toBeInTheDocument();
+    });
+
     it("does not save right after loading", async () => {
       renderDashboard();
       await screen.findAllByTestId("widget");

@@ -1,17 +1,30 @@
+.city-temperature {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
 .widget-big-number {
   font-family: var(--heading);
-  font-size: 44px;
-  font-weight: 600;
-  letter-spacing: -1px;
+  font-size: clamp(40px, 4vw, 52px);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -1.5px;
   color: var(--text-h);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 }
 
-.widget-body p {
-  margin: 2px 0;
+.city-temperature-place {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
 }
 
-.widget-body p:not(.widget-big-number) {
-  font-size: 14px;
+.city-temperature-detail {
+  font-size: 13px;
   color: var(--text);
 }

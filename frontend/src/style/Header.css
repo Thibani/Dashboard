@@ -6,22 +6,43 @@
 .app-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
-  padding: 0 24px;
+  gap: 12px;
+  height: 64px;
+  padding: 0 var(--gutter);
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
 }
 
 .app-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--heading);
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
   color: var(--text-h);
   text-decoration: none;
+}
+
+/* Logo mark: a 2x2 grid of tiles, drawn in CSS. */
+.app-header-brand::before {
+  content: "";
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background:
+    linear-gradient(var(--bg), var(--bg)) 50% 0 / 2px 100% no-repeat,
+    linear-gradient(var(--bg), var(--bg)) 0 50% / 100% 2px no-repeat,
+    linear-gradient(135deg, var(--accent), #6e56ff);
+  box-shadow: 0 4px 12px -4px var(--accent-border);
 }
 
 .app-header-profile {
@@ -33,13 +54,15 @@
 .app-header-auth-links {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: clamp(8px, 2vw, 16px);
   font-size: 14px;
 }
 
 .app-header-auth-links a {
   color: var(--text);
   text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
 }
 
 .app-header-auth-links a:hover {
@@ -47,16 +70,22 @@
 }
 
 .app-header-cta {
-  padding: 7px 14px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--bg) !important;
   font-weight: 500;
+  box-shadow: 0 4px 12px -4px var(--accent-border);
+  transition: filter 0.15s ease;
+}
+
+.app-header-cta:hover {
+  filter: brightness(1.08);
 }
 
 .app-header-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border: 1px solid var(--accent-border);
   border-radius: 50%;
   background: var(--accent-bg);
@@ -68,48 +97,71 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: box-shadow 0.15s ease;
+}
+
+.app-header-avatar:hover,
+.app-header-avatar[aria-expanded="true"] {
+  box-shadow: 0 0 0 4px var(--accent-bg);
 }
 
 .app-header-menu {
   position: absolute;
-  top: 46px;
+  top: 50px;
   right: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 180px;
-  padding: 12px;
+  gap: 2px;
+  width: max-content;
+  min-width: 220px;
+  max-width: calc(100vw - 2 * var(--gutter));
+  padding: 8px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
   text-align: left;
+  animation: menu-in 0.12s ease-out;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 .app-header-menu-email {
   font-size: 13px;
   color: var(--text);
   word-break: break-all;
-  margin: 0 0 4px;
+  margin: 0;
+  padding: 6px 10px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
 }
 
 .app-header-menu button,
 .app-header-menu a {
-  align-self: flex-start;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-h);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.app-header-menu a {
+  font-size: 14px;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .app-header-menu button:hover,
 .app-header-menu a:hover {
-  background: var(--code-bg);
+  background: var(--surface-2);
+}
+
+/* "Delete account" is the last entry: make it read as dangerous. */
+.app-header-menu button:last-child {
+  color: var(--danger);
 }

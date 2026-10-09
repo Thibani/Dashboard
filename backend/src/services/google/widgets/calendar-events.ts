@@ -44,6 +44,7 @@ export const calendarEventsWidget: WidgetDefinition<Config> = {
         url: event.htmlLink,
         location: event.location ?? null,
         start: event.start.dateTime ?? event.start.date ?? null,
+        end: event.end.dateTime ?? event.end.date ?? null,
         allDay: !event.start.dateTime,
       })),
     };

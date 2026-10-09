@@ -1,5 +1,6 @@
 import { oauthLoginUrl } from "../../lib/api";
 import { useOAuthProviders } from "../../hooks/useOAuth";
+import { ServiceIcon } from "../../components/ServiceIcon";
 import "../../style/OAuth.css";
 
 /** "Continue with GitHub / Google" on the login and register pages. */
@@ -13,6 +14,7 @@ export function OAuthButtons() {
       <div className="oauth-divider"><span>or</span></div>
       {available.map((p) => (
         <a key={p.name} className={`oauth-button oauth-button-${p.name}`} href={oauthLoginUrl(p.name)}>
+          <ServiceIcon service={p.name} size={18} />
           Continue with {p.label}
         </a>
       ))}

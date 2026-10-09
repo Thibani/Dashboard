@@ -13,10 +13,10 @@ export default function CityTemperatureDisplay({ data, isLoading, error }: Widge
   if (error) return <p className="widget-error">{error.message}</p>;
   const weather = data as WeatherData;
   return (
-    <div>
+    <div className="city-temperature">
       <p className="widget-big-number">{Math.round(weather.temperatureC)}°C</p>
-      <p>{weather.city}, {weather.country}</p>
-      <p>{weather.precipitationMm} mm precipitation</p>
+      <p className="city-temperature-place">{weather.city}, {weather.country}</p>
+      <p className="city-temperature-detail">{weather.precipitationMm} mm precipitation</p>
     </div>
   );
 }

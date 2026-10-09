@@ -82,8 +82,48 @@ describe("AddWidgetDialog", () => {
     });
   });
 
-  it("uses the edited refresh rate", async () => {
+  it("refuses to add a widget whose parameters are empty", async () => {
     renderNew();
+    await userEvent.click(screen.getByRole("button", { name: "Add to dashboard" }));
+
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("Please fill in the city.");
+  });
+
+  it("does not accept only spaces, and trims what it saves", async () => {
+    renderNew();
+    await userEvent.type(screen.getByLabelText("city"), "   ");
+    await userEvent.click(screen.getByRole("button", { name: "Add to dashboard" }));
+    expect(onConfirm).not.toHaveBeenCalled();
+
+    await userEvent.type(screen.getByLabelText("city"), "Paris  ");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument(); // typing clears the error
+    await userEvent.click(screen.getByRole("button", { name: "Add to dashboard" }));
+    expect(onConfirm).toHaveBeenCalledWith(expect.objectContaining({ config: { city: "Paris" } }));
+  });
+
+  it("refuses a value its input rejects, like a link that is not a URL", async () => {
+    function UrlConfigForm({ value, onChange }: WidgetConfigFormProps) {
+      return (
+        <label>
+          Feed URL
+          <input type="url" value={(value.link as string) ?? ""} onChange={(e) => onChange({ link: e.target.value })} />
+        </label>
+      );
+    }
+    vi.mocked(getConfigForm).mockReturnValue(UrlConfigForm);
+    renderNew();
+    await userEvent.selectOptions(service(), "rss");
+    await userEvent.type(screen.getByLabelText("Feed URL"), "not a url");
+    await userEvent.click(screen.getByRole("button", { name: "Add to dashboard" }));
+
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(/^Feed URL:/);
+  });
+
+    it("uses the edited refresh rate", async () => {
+    renderNew();
+    await userEvent.type(screen.getByLabelText("city"), "Paris");
     const rate = screen.getByRole("spinbutton");
     expect(rate).toHaveAttribute("min", "10");
     await userEvent.clear(rate);

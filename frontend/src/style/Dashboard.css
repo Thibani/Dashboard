@@ -1,88 +1,156 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 24px;
+  gap: 24px;
   width: 100%;
-  box-sizing: border-box;
+  padding: 28px var(--gutter) 48px;
 }
 
 .dashboard-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px 16px;
 }
 
 .dashboard-header h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -0.6px;
 }
 
 .dashboard-header button {
-  padding: 8px 16px;
-  border: 1px solid var(--accent-border);
-  border-radius: 8px;
-  background: var(--accent-bg);
-  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--bg);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 6px 16px -6px var(--accent-border);
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
 .dashboard-header button:hover {
-  background: var(--accent);
-  color: var(--bg);
+  filter: brightness(1.08);
 }
 
 .dashboard-header button:active {
   transform: scale(0.97);
 }
 
+/* --cols is read by the widgets below to cap their width (see .sortable-widget). */
 .dashboard-grid {
+  --cols: 4;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: 180px;
-  gap: 16px;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-auto-rows: 200px;
+  grid-auto-flow: dense; /* fill the holes left by big widgets */
+  gap: clamp(12px, 1.4vw, 20px);
 }
 
+@media (min-width: 1800px) {
+  .dashboard-grid {
+    --cols: 5;
+  }
+}
+
+@media (max-width: 1199px) {
+  .dashboard-grid {
+    --cols: 3;
+  }
+}
+
+@media (max-width: 899px) {
+  .dashboard-grid {
+    --cols: 2;
+  }
+}
+
+/* The whole empty card is a button that opens the "Add widget" dialog. */
 .dashboard-empty {
-  text-align: center;
-  padding: 48px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 64px 16px;
   color: var(--text);
-  opacity: 0.7;
   font-size: 15px;
-  border: 1px dashed var(--border);
-  border-radius: 10px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
+.dashboard-empty:hover {
+  border-color: var(--accent-border);
+  background: color-mix(in srgb, var(--accent) 4%, var(--bg));
+  color: var(--text-h);
+}
+
+.dashboard-empty-plus {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 500;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.dashboard-empty:hover .dashboard-empty-plus {
+  background: var(--accent);
+  color: var(--bg);
+  transform: scale(1.06);
+}
+
+/* --w / --h are the widget's size, set inline by Dashboard.tsx. */
 .sortable-widget {
   position: relative;
   min-width: 0;
   min-height: 0;
+  grid-column: span min(var(--w, 1), var(--cols));
+  grid-row: span var(--h, 1);
 }
 
 .widget-resize-handle {
   position: absolute;
-  right: 4px;
-  bottom: 4px;
-  width: 16px;
-  height: 16px;
+  right: 6px;
+  bottom: 6px;
+  width: 18px;
+  height: 18px;
   cursor: nwse-resize;
-  z-index: 10;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sortable-widget:hover .widget-resize-handle {
+  opacity: 1;
 }
 
 .widget-resize-handle::before {
   content: "";
   position: absolute;
-  right: 2px;
-  bottom: 2px;
+  right: 3px;
+  bottom: 3px;
   width: 8px;
   height: 8px;
   border-right: 2px solid var(--text);
   border-bottom: 2px solid var(--text);
-  opacity: 0.5;
+  border-bottom-right-radius: 2px;
+  opacity: 0.6;
 }
 
 .sortable-widget > .widget-card {
@@ -92,16 +160,39 @@
   min-height: 0;
 }
 
-@media (max-width: 640px) {
+/* Phones: one column, each widget as tall as its content, no resizing. */
+@media (max-width: 599px) {
   .dashboard {
-    padding: 16px;
+    padding-top: 20px;
+    gap: 18px;
+  }
+
+  .dashboard-header button {
+    flex: 1;
+    justify-content: center;
   }
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    --cols: 1;
+    grid-auto-rows: minmax(180px, auto);
   }
 
   .sortable-widget {
-    grid-column: span 1 !important;
+    grid-row: span 1;
+  }
+
+  .sortable-widget > .widget-card {
+    max-height: 640px;
+  }
+
+  .widget-resize-handle {
+    display: none;
+  }
+}
+
+/* Touch screens have no hover: keep the handle visible. */
+@media (hover: none) {
+  .widget-resize-handle {
+    opacity: 1;
   }
 }

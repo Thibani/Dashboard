@@ -1,4 +1,5 @@
 import { findWidget } from "../services-registry";
+import { getWidget } from "../services/registry";
 
 const MAX_STRING_LENGTH = 2048;
 const MAX_INTEGER = 1000;
@@ -48,6 +49,14 @@ export function validateWidgetConfig(service: string, widget: string, config: un
       }
       clean[param.name] = value;
     }
+  }
+
+  // Then the widget's own rules (e.g. the RSS link must be a URL), so a
+  // config that can't work is refused when saved, not at every refresh.
+  const own = getWidget(service, widget)?.configSchema.safeParse(clean);
+  if (own && !own.success) {
+    const issue = own.error.issues[0];
+    return { ok: false, error: `${issue.path.join(".") || "config"}: ${issue.message}` };
   }
 
   return { ok: true, config: clean };

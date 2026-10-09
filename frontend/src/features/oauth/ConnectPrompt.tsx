@@ -1,4 +1,5 @@
 import { useConnectProvider, useOAuthProviders } from "../../hooks/useOAuth";
+import { ServiceIcon } from "../../components/ServiceIcon";
 import "../../style/OAuth.css";
 
 /** Shown in place of a widget whose service needs an account the user hasn't connected. */
@@ -7,9 +8,10 @@ export function ConnectPrompt({ provider, message }: { provider: string; message
   const label = useOAuthProviders().data?.find((p) => p.name === provider)?.label ?? provider;
 
   return (
-    <div className="connect-prompt">
+    <div className={`connect-prompt connect-prompt-${provider}`}>
       <p>{message}</p>
       <button onClick={() => connect.mutate(provider)} disabled={connect.isPending}>
+        <ServiceIcon service={provider} size={16} />
         Connect {label}
       </button>
       {connect.error && <p className="widget-error">{connect.error.message}</p>}

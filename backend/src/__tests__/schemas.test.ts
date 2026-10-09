@@ -58,6 +58,18 @@ describe("dashboardSchema", () => {
     expect(dashboardSchema.safeParse({ instances: [{ ...valid, widget: "nope" }] }).success).toBe(false);
   });
 
+  it("keeps the widget size (it used to be stripped, so widgets came back 1x1)", () => {
+    const result = dashboardSchema.safeParse({ instances: [{ ...valid, width: 2, height: 3 }] });
+    expect(result.success).toBe(true);
+    expect(result.data?.instances[0]).toMatchObject({ width: 2, height: 3 });
+  });
+
+  it("rejects a widget size outside the grid", () => {
+    for (const size of [{ width: 0 }, { width: 6 }, { height: 0 }, { height: 9 }, { width: 1.5 }]) {
+      expect(dashboardSchema.safeParse({ instances: [{ ...valid, ...size }] }).success).toBe(false);
+    }
+  });
+
   it("rejects a refresh rate below 10 seconds", () => {
     expect(dashboardSchema.safeParse({ instances: [{ ...valid, refreshRateSeconds: 1 }] }).success).toBe(false);
   });

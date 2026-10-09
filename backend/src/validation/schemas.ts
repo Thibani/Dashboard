@@ -29,6 +29,10 @@ export const loginSchema = z.object({
     .max(PASSWORD_MAX, "Invalid email or password"),
 });
 
+// The widest dashboard grid has 5 columns (frontend Dashboard.css).
+const MAX_WIDGET_COLUMNS = 5;
+const MAX_WIDGET_ROWS = 8;
+
 const widgetInstanceSchema = z
   .object({
     id: z.string().min(1).max(64),
@@ -36,6 +40,10 @@ const widgetInstanceSchema = z
     widget: z.string().min(1).max(64),
     config: z.record(z.string(), z.unknown()),
     refreshRateSeconds: z.number().int().min(10).max(86400),
+    // Size on the grid, in columns/rows. Must be listed here: zod drops
+    // unknown keys, so without these the size was lost on every save.
+    width: z.number().int().min(1).max(MAX_WIDGET_COLUMNS).optional(),
+    height: z.number().int().min(1).max(MAX_WIDGET_ROWS).optional(),
   })
   .superRefine((instance, ctx) => {
     // The config must match what /about.json declares for this widget.

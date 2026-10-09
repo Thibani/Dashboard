@@ -4,32 +4,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(10, 8, 20, 0.5);
+  backdrop-filter: blur(4px);
   z-index: 100;
   padding: 16px;
-  box-sizing: border-box;
+  animation: backdrop-in 0.15s ease-out;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .dialog {
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
   max-height: 90vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   padding: 24px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 18px;
   box-shadow: var(--shadow);
-  box-sizing: border-box;
   text-align: left;
+  animation: dialog-in 0.18s ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
 }
 
 .dialog h2 {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 20px;
 }
 
@@ -44,13 +57,20 @@
 
 .field select,
 .field input {
-  padding: 8px 10px;
+  width: 100%;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--text-h);
   font: inherit;
   font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field select:hover:not(:disabled),
+.field input:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
 .field select:focus,
@@ -66,40 +86,58 @@
   cursor: not-allowed;
 }
 
+/* Service logo shown inside the left of the "Service" select. */
+.field-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-with-icon .service-icon {
+  position: absolute;
+  left: 12px;
+  pointer-events: none;
+}
+
+.field-with-icon select {
+  padding-left: 42px;
+}
+
 .field-hint {
-  margin: -6px 0 0;
+  margin: -8px 0 0;
   font-size: 12.5px;
   font-weight: 400;
   color: var(--text);
-  opacity: 0.8;
 }
 
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .dialog-actions button {
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--text-h);
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, filter 0.15s ease;
 }
 
 .dialog-actions button:last-child {
-  border-color: var(--accent-border);
+  border-color: transparent;
   background: var(--accent);
   color: var(--bg);
+  font-weight: 600;
 }
 
 .dialog-actions button:last-child:hover:not(:disabled) {
-  opacity: 0.9;
+  filter: brightness(1.08);
 }
 
 .dialog-actions button:disabled {
@@ -108,5 +146,36 @@
 }
 
 .dialog-actions button:first-child:hover {
-  background: var(--code-bg);
+  background: var(--surface-2);
+}
+
+/* Phones: the dialog slides up from the bottom, buttons full width. */
+@media (max-width: 599px) {
+  .dialog-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .dialog {
+    max-width: none;
+    max-height: 92svh;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+    animation-name: sheet-in;
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
 }

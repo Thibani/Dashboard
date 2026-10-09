@@ -1,0 +1,201 @@
+/* ==========================================================================
+   Google widgets (features/services/google/*): Google Calendar look, with
+   Google's Material colors and font, light and dark.
+   ========================================================================== */
+
+.widget-card[data-service="google"] {
+  --g-fg: #3c4043;
+  --g-muted: #70757a;
+  --g-blue: #1a73e8;
+  --g-event: #039be5; /* Calendar's default "Peacock" event color */
+  --g-hover: #f1f3f4;
+  --g-border: #dadce0;
+  --service-color: #1a73e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .widget-card[data-service="google"] {
+    --g-fg: #e8eaed;
+    --g-muted: #9aa0a6;
+    --g-blue: #8ab4f8;
+    --g-event: #4fc3f7;
+    --g-hover: rgba(232, 234, 237, 0.08);
+    --g-border: #3c4043;
+    --service-color: #8ab4f8;
+  }
+}
+
+/* Google's four colors on top of the card instead of a single line. */
+.widget-card[data-service="google"]::before {
+  background: linear-gradient(90deg, #4285f4 0 25%, #ea4335 25% 50%, #fbbc05 50% 75%, #34a853 75%);
+  opacity: 1;
+}
+
+.widget-card[data-service="google"] .widget-title {
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--g-fg);
+}
+
+.gcal {
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  color: var(--g-fg);
+  display: flex;
+  flex-direction: column;
+}
+
+.gcal-muted {
+  color: var(--g-muted);
+  font-size: 13px;
+}
+
+.gcal-day {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--g-border);
+}
+
+.gcal-day:last-child {
+  border-bottom: none;
+}
+
+.gcal-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding-top: 4px;
+}
+
+.gcal-weekday,
+.gcal-month {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--g-muted);
+}
+
+.gcal-daynum {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 2px 0;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--g-fg);
+}
+
+/* Today: blue circle, like the Calendar header. */
+.gcal-today .gcal-weekday,
+.gcal-today .gcal-month {
+  color: var(--g-blue);
+}
+
+.gcal-today .gcal-daynum {
+  background: var(--g-blue);
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .gcal-today .gcal-daynum {
+    color: #202124;
+  }
+}
+
+.gcal-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gcal-event {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.1s ease;
+}
+
+.gcal-event:hover {
+  background: var(--g-hover);
+}
+
+.gcal-event-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--g-event);
+}
+
+.gcal-event-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gcal-event-title {
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gcal-event-detail {
+  font-size: 12px;
+  color: var(--g-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* All-day events: a filled chip, as in Calendar. */
+.gcal-event-allday {
+  background: var(--g-event);
+  color: #fff;
+}
+
+.gcal-event-allday:hover {
+  background: color-mix(in srgb, var(--g-event) 88%, #000);
+}
+
+.gcal-event-allday .gcal-event-detail {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (prefers-color-scheme: dark) {
+  .gcal-event-allday,
+  .gcal-event-allday .gcal-event-detail {
+    color: #202124;
+  }
+}
+
+.gcal-empty {
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 8px;
+  text-align: center;
+}
+
+.gcal-empty-title {
+  font-size: 16px;
+  font-weight: 500;
+}
