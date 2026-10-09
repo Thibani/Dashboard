@@ -118,7 +118,11 @@ After resetting the users, log out in the browser (or clear the `dashboard_auth`
 | Variable | Used by | Default | Description |
 | --- | --- | --- | --- |
 | `JWT_SECRET` | server | none (**required**) | Secret used to sign login tokens. The server refuses to start without it. |
-| `FRONTEND_URL` | server | `http://localhost:3000` | Base URL used to build the link in the confirmation email. |
+| `FRONTEND_URL` | server | `http://localhost:3000` | Base URL of the frontend: confirmation email links and where GitHub/Google sign-in sends the browser back. |
+| `API_URL` | server | `http://localhost:8080` | Public URL of the API, used to build the OAuth callback URL (`<API_URL>/api/oauth/<provider>/callback`). |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | server | none | GitHub OAuth app. Without them, GitHub sign-in and GitHub widgets are hidden. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | server | none | Google OAuth client. Without them, Google sign-in and Google widgets are hidden. |
+| `TOKEN_ENCRYPTION_KEY` | server | `JWT_SECRET` | Key used to encrypt the GitHub/Google tokens stored in the database. Changing it invalidates stored tokens (users must reconnect). |
 | `PORT` | server | `8080` | Port of the API. The subject requires 8080. |
 | `VITE_API_URL` | client, **build time** | `http://localhost:8080` | API address used by the browser. Vite inlines it at build time, so changing it requires a rebuild (`docker compose up --build`). |
 | Database settings | server and database | see `docker-compose.yml` | Credentials and connection details for PostgreSQL. |
@@ -279,7 +283,24 @@ interface WidgetInstance {
 | `AddWidgetDialog.tsx` | Add/edit dialog. Lists services and widgets from `/about.json`, renders the widget's config form and the refresh rate |
 | `<service>/<widget>/` | One folder per widget with `Display.tsx` and `ConfigForm.tsx` |
 
-`useWidgetData` calls `POST /widgets/preview` with the instance's service, widget and config, and re-fetches on the instance's refresh interval.
+`useWidgetData` calls `POST /api/widgets/data` (with the login token) with the instance's service, widget and config, and re-fetches on the instance's refresh interval. For a service that needs a GitHub/Google account the user hasn't connected, the API answers `409 provider_not_connected` and `WidgetShell` shows a **Connect** button instead of the widget.
+
+## GitHub / Google (OAuth)
+
+GitHub and Google are used for two things with one consent: signing in, and giving the `github` / `google` widgets access to the user's data.
+
+1. Create the OAuth apps and register these callback URLs:
+   - GitHub (Settings → Developer settings → OAuth Apps): `http://localhost:8080/api/oauth/github/callback`
+   - Google (Cloud Console → APIs & Services → Credentials → OAuth client ID, type *Web application*): `http://localhost:8080/api/oauth/google/callback`. Enable the **Google Calendar API** and add yourself as a test user on the consent screen.
+2. Put the client IDs and secrets in `.env` (see [Configuration](#configuration)) and restart.
+
+Flows (`backend/src/controllers/oauth.ts`):
+
+- **Sign in**: `GET /api/oauth/<provider>` → provider consent → `/api/oauth/<provider>/callback` → frontend `/oauth/callback#token=...`. The account is matched by provider id, then by verified email, else created.
+- **Connect** (logged-in user, from *Connected accounts* or a widget's Connect button): `POST /api/oauth/<provider>/link` returns a 2-minute link URL, the browser follows it, and the callback attaches the provider account to the current user.
+- `GET /api/oauth/connections` lists linked accounts, `DELETE /api/oauth/<provider>` disconnects (refused if it is the user's only way to sign in).
+
+The `state` parameter is a signed token tied to an `httpOnly` cookie, which blocks login CSRF. Provider tokens are stored encrypted (AES-256-GCM) in `oauth_accounts`, and Google tokens are refreshed automatically when they expire.
 
 ### Styling
 
@@ -291,16 +312,17 @@ Example: a `github` service with a `latest_commits` widget.
 
 **Backend**
 
-1. Declare it in the `services` array in `index.ts` (this feeds `/about.json`): the widget `name`, a `description`, and its `params`, each with a `name` and a `type` of `string` or `integer`. A widget must have at least one parameter.
-2. Implement the data fetching for it, following how `city_temperature` and `article_list` are handled by the widgets route (`POST /widgets/preview`). It receives the `config` object and must return JSON.
+1. Create `backend/src/services/<service>/index.ts` (a `ServiceDefinition`) and one file per widget in `widgets/` (a `WidgetDefinition`: `name`, `description`, `params` with a `type` of `string` or `integer`, a zod `configSchema`, and `fetchData`). A widget must have at least one parameter.
+2. Add the service to `services/registry.ts`. `/about.json`, config validation and the widget data route pick it up automatically.
+3. If it needs the user's GitHub/Google account, set `authType: "oauth2"` and `oauthProvider: "github"` (or `"google"`), add the scopes it needs to that provider in `services/oauth/providers.ts`, and call the API with `credentials.accessToken` through `providerFetch` (see `services/github/`).
 
 **Frontend**
 
-3. Create the folder `github/latest_commits/` next to the existing widgets, with:
+4. Create the folder `github/latest_commits/` next to the existing widgets, with:
    - `ConfigForm.tsx`: an input for each parameter. Keys in the `config` object must match the parameter names declared in step 1. If a parameter needs a default (like `number` in the RSS form), set it in a `useEffect`.
    - `Display.tsx`: renders `data`, and handles `isLoading` and `error`.
-4. Register both in `registry.ts` under `github` / `latest_commits`.
-5. Add a CSS file in `style/` if the widget needs styles, and import it.
+5. Nothing to register: `registry.ts` finds them by folder name.
+6. Add a CSS file in `style/` if the widget needs styles, and import it.
 
 Then restart with `docker compose up --build` and check that the widget appears in `/about.json` and in the **Add widget** dialog.
 
@@ -357,6 +379,6 @@ Rebuild (`--build`) after changing a Dockerfile or a dependency. `npm run build`
 
 ## Known limitations
 
-- Users do not subscribe to services: every service is available to every logged-in user, and there is no OAuth linking to third-party accounts.
+- Users do not subscribe to services: every service is available to every logged-in user. GitHub/Google widgets ask the user to connect their account the first time.
 - No administration section.
 - No dedicated "resend confirmation email" endpoint: registering again with the same email does the same job.
