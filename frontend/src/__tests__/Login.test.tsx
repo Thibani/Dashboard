@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Login } from "./Login";
+import { Login } from "../routes/Login";
 import { loginRequest } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,14 +11,15 @@ const login = vi.fn();
 
 vi.mock("../lib/api", () => ({ loginRequest: vi.fn() }));
 vi.mock("../context/AuthContext", () => ({ useAuth: vi.fn() }));
+vi.mock("../features/oauth/OAuthButtons", () => ({ OAuthButtons: () => <div>oauth-buttons</div> }));
 vi.mock("react-router-dom", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react-router-dom")>()),
   useNavigate: () => navigate,
 }));
 
-function renderLogin(state?: { from: string }) {
+function renderLogin(state?: { from: string }, search = "") {
   return render(
-    <MemoryRouter initialEntries={[{ pathname: "/login", state }]}>
+    <MemoryRouter initialEntries={[{ pathname: "/login", search, state }]}>
       <Login />
     </MemoryRouter>
   );
@@ -44,6 +45,16 @@ describe("Login", () => {
     expect(screen.getByLabelText(/email/i)).toHaveAttribute("type", "email");
     expect(screen.getByLabelText(/password/i)).toHaveAttribute("type", "password");
     expect(screen.getByRole("link", { name: "Create one" })).toHaveAttribute("href", "/register");
+  });
+
+  it("shows the GitHub/Google sign-in buttons", () => {
+    renderLogin();
+    expect(screen.getByText("oauth-buttons")).toBeInTheDocument();
+  });
+
+  it("explains a failed GitHub/Google sign-in passed as ?error=", () => {
+    renderLogin(undefined, "?error=access_denied");
+    expect(screen.getByText("You cancelled the authorization.")).toBeInTheDocument();
   });
 
   it("logs in and navigates to / by default", async () => {

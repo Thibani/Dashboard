@@ -2,10 +2,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Register } from "./Register";
+import { Register } from "../routes/Register";
 import { registerRequest } from "../lib/api";
 
 vi.mock("../lib/api", () => ({ registerRequest: vi.fn() }));
+vi.mock("../features/oauth/OAuthButtons", () => ({ OAuthButtons: () => null }));
 
 const renderRegister = () =>
   render(

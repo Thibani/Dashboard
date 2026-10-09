@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Header } from "./Header";
+import { Header } from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 
 vi.mock("../context/AuthContext", () => ({ useAuth: vi.fn() }));

@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { Layout } from "./Layout";
+import { Layout } from "../components/layout/Layout";
 
-vi.mock("../Header", () => ({ Header: () => <header>fake header</header> }));
+vi.mock("../components/Header", () => ({ Header: () => <header>fake header</header> }));
 
 describe("Layout", () => {
   it("renders the header and the matched child route", () => {

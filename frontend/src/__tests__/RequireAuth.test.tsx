@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { RequireAuth } from "./RequireAuth";
-import { useAuth } from "../../context/AuthContext";
+import { RequireAuth } from "../components/layout/RequireAuth";
+import { useAuth } from "../context/AuthContext";
 
-vi.mock("../../context/AuthContext", () => ({ useAuth: vi.fn() }));
+vi.mock("../context/AuthContext", () => ({ useAuth: vi.fn() }));
 
 function setAuth(state: { isAuthenticated: boolean; isLoading: boolean }) {
   vi.mocked(useAuth).mockReturnValue({

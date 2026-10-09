@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 
 const KEY = "dashboard_auth";
 const user = { email: "esteban@example.com" };

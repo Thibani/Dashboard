@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "../routes/Dashboard";
 import { fetchAbout, fetchDashboard, saveDashboard, UnauthorizedError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import type { AboutResponse, WidgetInstance } from "../features/widgets/types";
