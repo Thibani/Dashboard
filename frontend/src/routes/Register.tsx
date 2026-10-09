@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
 import { registerRequest } from "../lib/api";
+import { OAuthButtons } from "../features/oauth/OAuthButtons";
 
 export function Register() {
   const [email, setEmail] = useState("");
@@ -71,6 +72,8 @@ export function Register() {
         <button type="submit" disabled={submitting}>
           {submitting ? "Creating account…" : "Create account"}
         </button>
+
+        <OAuthButtons />
 
         <p className="auth-switch">
           Already have an account? <Link to="/login">Log in</Link>

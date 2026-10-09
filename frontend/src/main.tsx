@@ -6,6 +6,8 @@ import { Dashboard } from "./routes/Dashboard";
 import { Login } from "./routes/Login";
 import { Register } from "./routes/Register";
 import { Verify } from "./routes/Verify";
+import { OAuthCallback } from "./routes/OAuthCallback";
+import { Connections } from "./routes/Connections";
 import { Layout } from "./components/layout/Layout";
 import { RequireAuth } from "./components/layout/RequireAuth";
 import { AuthProvider } from "./context/AuthContext";
@@ -24,6 +26,8 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/verify", element: <Verify /> },
+      { path: "/oauth/callback", element: <OAuthCallback /> },
+      { path: "/connections", element: <RequireAuth><Connections /></RequireAuth> },
     ],
   },
 ]);

@@ -1,4 +1,6 @@
 import { useWidgetData } from "../../hooks/useWidgetData";
+import { ProviderNotConnectedError } from "../../lib/api";
+import { ConnectPrompt } from "../oauth/ConnectPrompt";
 import { getDisplay } from "./registry";
 import { type WidgetInstance } from "./types";
 import "../../style/WidgetShell.css"
@@ -25,7 +27,9 @@ export function WidgetShell({ instance, onRemove, onEdit, dragHandleProps }: Wid
         </div>
       </div>
       <div className="widget-body">
-        {Display ? (
+        {error instanceof ProviderNotConnectedError ? (
+          <ConnectPrompt provider={error.provider} message={error.message} />
+        ) : Display ? (
           <Display data={data} isLoading={isLoading} error={error as Error | null} />
         ) : (
           <p className="widget-error">Unknown widget: {instance.service}.{instance.widget}</p>

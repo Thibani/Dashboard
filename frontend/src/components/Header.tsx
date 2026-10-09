@@ -77,6 +77,10 @@ export function Header() {
               <div className="app-header-menu">
                 <p className="app-header-menu-email">{user.email}</p>
 
+                <Link to="/connections" onClick={() => setMenuOpen(false)}>
+                  Connected accounts
+                </Link>
+
                 <button onClick={logout}>
                   Log out
                 </button>

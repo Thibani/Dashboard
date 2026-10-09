@@ -1,12 +1,16 @@
 import { useState, type SyntheticEvent } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { loginRequest } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { OAuthButtons } from "../features/oauth/OAuthButtons";
+import { oauthErrorMessage } from "../features/oauth/errors";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  // A failed GitHub/Google sign-in comes back as /login?error=<code>.
+  const [error, setError] = useState<string | null>(() => oauthErrorMessage(searchParams.get("error")));
   const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -60,6 +64,8 @@ export function Login() {
         <button type="submit" disabled={submitting}>
           {submitting ? "Logging in…" : "Log in"}
         </button>
+
+        <OAuthButtons />
 
         <p className="auth-switch">
           No account yet? <Link to="/register">Create one</Link>
