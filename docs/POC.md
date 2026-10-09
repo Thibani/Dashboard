@@ -23,7 +23,7 @@ If the plugin pattern holds for two independently-shaped services (one calling a
 | A widget can call a real external API and return usable data | `POST /widgets/preview` for both widgets | Weather returned live temperature for Strasbourg; RSS returned real parsed articles from a live feed |
 | `docker-compose build` / `docker-compose up` works as the subject mandates | Full `docker compose build && docker compose up` cycle, including a from-scratch rebuild after `down -v` | `server` container serves on port `8080` as required; all three services (`postgres`, `server`, `client`) start and pass healthchecks |
 | The Timer concept holds without a custom scheduler | Frontend `useWidgetData` hook wraps TanStack Query with `refetchInterval` set from each widget instance's stored refresh rate | Confirmed polling behavior in the browser — each widget refetches independently on its own interval, no shared `setInterval` state |
-| Frontend plugin symmetry | Added `Display.tsx` + `ConfigForm.tsx` per widget under `features/widgets/services/<service>/<widget>/`, resolved at runtime via Vite's `import.meta.glob` | New widget UI requires no edits to `registry.ts`, `WidgetShell.tsx`, or the add-widget dialog |
+| Frontend plugin symmetry | Added `Display.tsx` + `ConfigForm.tsx` per widget under `features/services/<service>/<widget>/`, resolved at runtime via Vite's `import.meta.glob` | New widget UI requires no edits to `registry.ts`, `WidgetShell.tsx`, or the add-widget dialog |
 
 ## 4. Conclusion
 
