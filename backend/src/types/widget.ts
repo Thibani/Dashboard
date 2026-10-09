@@ -8,8 +8,8 @@ export interface WidgetParam {
 }
 
 export interface ServiceCredentials {
-  // Populated from user_services once OAuth/credential storage is wired up.
-  // For "none"-auth services (weather, rss) this is always null.
+  // For "oauth2" services: the user's token for that provider (see
+  // services/oauth/credentials.ts). For "none"-auth services this is null.
   accessToken?: string;
   refreshToken?: string;
   username?: string;
@@ -34,20 +34,13 @@ export interface WidgetDefinition<TConfig extends Record<string, unknown> = Reco
 
 export type ServiceAuthType = "none" | "credentials" | "oauth2";
 
-export interface OAuthProviderConfig {
-  authorizationUrl: string;
-  tokenUrl: string;
-  scope: string[];
-  clientIdEnvVar: string;
-  clientSecretEnvVar: string;
-}
-
 export interface ServiceDefinition {
   /** Unique service identifier, used in about.json and widget instances. */
   name: string;
   authType: ServiceAuthType;
-  /** Required when authType === "oauth2". */
-  oauth?: OAuthProviderConfig;
+  /** Required when authType === "oauth2": the provider in services/oauth/providers.ts
+   *  whose token (the one the user linked) is passed to fetchData as credentials. */
+  oauthProvider?: string;
   /** Required when authType === "credentials" (e.g. username/password login). */
   credentialSchema?: ZodType<unknown>;
   widgets: WidgetDefinition<any>[];

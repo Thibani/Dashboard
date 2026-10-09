@@ -1,3 +1,5 @@
+import { listServices } from "./services/registry";
+
 export type ParamType = "string" | "integer";
 
 export interface WidgetParam {
@@ -16,41 +18,16 @@ export interface ServiceDefinition {
   widgets: WidgetDefinition[];
 }
 
-export const services: ServiceDefinition[] = [
-  {
-    name: "weather",
-    widgets: [
-      {
-        name: "city_temperature",
-        description: "Display temperature for a city",
-        params: [{ name: "city", type: "string" }],
-      },
-      {
-          name: "city_meto_summary",
-          description: "Display a weather summary for a city",
-          params: [{ name: "city", type: "string" }],
-      },
-      {
-          name: "city_weather_detailed",
-          description: "Display detailed weather information for a city",
-          params: [{ name: "city", type: "string" }],
-      },
-    ],
-  },
-  {
-    name: "rss",
-    widgets: [
-      {
-        name: "article_list",
-        description: "Displaying the list of the last articles",
-        params: [
-          { name: "link", type: "string" },
-          { name: "number", type: "integer" },
-        ],
-      },
-    ],
-  },
-];
+// The public /about.json view of services/registry.ts. Derived rather than
+// written by hand, so a new service or widget can't be forgotten here.
+export const services: ServiceDefinition[] = listServices().map((service) => ({
+  name: service.name,
+  widgets: service.widgets.map((widget) => ({
+    name: widget.name,
+    description: widget.description,
+    params: widget.params,
+  })),
+}));
 
 export function findWidget(service: string, widget: string): WidgetDefinition | undefined {
   return services.find((s) => s.name === service)?.widgets.find((w) => w.name === widget);
