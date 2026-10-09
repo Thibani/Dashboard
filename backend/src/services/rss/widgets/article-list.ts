@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Parser from "rss-parser";
 import { WidgetDefinition } from "../../../types/widget";
+import { safeFetchText } from "../../safe-fetch";
 
 const configSchema = z.object({
   link: z.string().url(),
@@ -21,7 +22,9 @@ export const articleListWidget: WidgetDefinition<Config> = {
   configSchema,
   defaultRefreshRateSeconds: 900,
   async fetchData(config) {
-    const feed = await parser.parseURL(config.link);
+    // Not parser.parseURL(): the link comes from the user, so it is downloaded
+    // through safeFetchText, which refuses internal addresses.
+    const feed = await parser.parseString(await safeFetchText(config.link));
     return {
       feedTitle: feed.title,
       articles: (feed.items ?? []).slice(0, config.number).map((item) => ({
