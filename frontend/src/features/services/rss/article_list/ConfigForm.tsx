@@ -15,6 +15,7 @@ export default function ArticleListConfigForm({ value, onChange }: WidgetConfigF
       <label className="field">
         Feed URL
         <input
+          required
           type="url"
           value={(value.link as string) ?? ""}
           onChange={(e) => onChange({ ...value, link: e.target.value })}
@@ -24,6 +25,7 @@ export default function ArticleListConfigForm({ value, onChange }: WidgetConfigF
       <label className="field">
         Number of articles
         <input
+          required
           type="number"
           min={1}
           max={50}

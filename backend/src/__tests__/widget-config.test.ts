@@ -37,4 +37,13 @@ describe("validateWidgetConfig", () => {
     expect(validateWidgetConfig("weather", "city_temperature", { city: "   " }).ok).toBe(false);
     expect(validateWidgetConfig("weather", "city_temperature", { city: "x".repeat(3000) }).ok).toBe(false);
   });
+
+  it("applies the widget's own rules too", () => {
+    expect(validateWidgetConfig("rss", "article_list", { link: "not a url", number: 5 })).toEqual({
+      ok: false,
+      error: "link: Invalid url",
+    });
+    // Generic limit is 1000, but the RSS widget only shows up to 50 articles.
+    expect(validateWidgetConfig("rss", "article_list", { link: "https://a.com", number: 51 }).ok).toBe(false);
+  });
 });

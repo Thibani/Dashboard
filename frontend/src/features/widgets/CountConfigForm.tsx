@@ -15,6 +15,7 @@ export function makeCountConfigForm(label: string, max: number, defaultValue: nu
       <label className="field">
         {label}
         <input
+          required
           type="number"
           min={1}
           max={max}
