@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { ProviderNotConnectedError } from "../services/oauth/credentials";
+import { UnsafeUrlError } from "../validation/ssrf-guard";
 
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ZodError) {
@@ -9,6 +10,10 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   // The frontend shows a "Connect <provider>" button for this code.
   if (err instanceof ProviderNotConnectedError) {
     return res.status(409).json({ error: err.message, code: "provider_not_connected", provider: err.provider });
+  }
+  // A URL pointing to an internal address: the user's input is wrong, not the server.
+  if (err instanceof UnsafeUrlError) {
+    return res.status(400).json({ error: `This URL is not allowed: ${err.message}` });
   }
   if (err instanceof Error) {
     console.error(err);

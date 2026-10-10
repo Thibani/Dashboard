@@ -45,11 +45,14 @@ export function isPrivateAddress(ip: string): boolean {
  * Throws UnsafeUrlError unless `input` is an http(s) URL whose host
  * resolves only to public IP addresses. Returns the parsed URL.
  *
- * Limits: the host is resolved here and again by fetch(), so DNS rebinding is
- * not fully covered. Also fetch with `redirect: "manual"` (or re-check each
- * hop), because a public URL can redirect to an internal one.
+ * Limits: the host is resolved here and again when connecting, so DNS
+ * rebinding is not covered by this check alone, and a public URL can redirect
+ * to an internal one. Use safeFetchText (services/safe-fetch.ts), which also
+ * checks every redirect and the address actually connected to.
+ *
+ * `isBlocked` is only replaced by tests.
  */
-export async function assertSafeUrl(input: string): Promise<URL> {
+export async function assertSafeUrl(input: string, isBlocked: (ip: string) => boolean = isPrivateAddress): Promise<URL> {
   let url: URL;
   try {
     url = new URL(input);
@@ -77,7 +80,7 @@ export async function assertSafeUrl(input: string): Promise<URL> {
     }
   }
 
-  if (addresses.length === 0 || addresses.some(isPrivateAddress)) {
+  if (addresses.length === 0 || addresses.some(isBlocked)) {
     throw new UnsafeUrlError("This address is not allowed");
   }
   return url;
